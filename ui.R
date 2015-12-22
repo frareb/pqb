@@ -32,7 +32,7 @@ shinyUI(fluidPage(
                           )
                         ),
                         fluidRow(
-                          column(12,plotOutput("plotSmart"),downloadButton('downloadPlotSmart','Descargar')
+                          column(12,plotOutput("plotSmart"),downloadButton('downloadPlotSmart','Descargar'))
                         )
                ),
                tabPanel("Loc.")
