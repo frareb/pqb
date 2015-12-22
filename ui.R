@@ -30,6 +30,9 @@ shinyUI(fluidPage(
                           ),
                           column(5,plotOutput("plotSexoEdad"),downloadButton('downloadPlotSexoEdad','Descargar')
                           )
+                        ),
+                        fluidRow(
+                          column(12,plotOutput("plotSmart"),downloadButton('downloadPlotSmart','Descargar')
                         )
                ),
                tabPanel("Loc.")
