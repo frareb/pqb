@@ -15,9 +15,26 @@ cuest<-read.table(archivo,sep=',',header=TRUE,na="n/a",colClasses=tipoDatos,enco
 
 
 shinyServer(function(input, output) {
+  ### plot smartphone
+  plotInputSmart <- function(){
+    col <- 15 # logical smartphone
+    x    <- cuest[,col]
+    par(mfrow=c(1,2))
+    barplot(table(cuest[,15]),main="Smartphone")
+    plot(cuest[,15]~cuest[,13],xlab="Edad",ylab="Smartphone")
+  }
+  output$plotSmart <- renderPlot({ plotInputSmart() })
+  output$downloadPlotSmart <- downloadHandler(
+    filename = function(){paste0("agri_smart",".png")},
+    content = function(file){
+      png(file,width=800,height=600)
+      plotInputSmart()
+      dev.off()
+    }
+  )
   ### plot and download: Edad
   plotInputEdad <- function(){
-    col <- 13 # edad
+    col <- 13 # integer edad
     x    <- cuest[,col]
     bins <- seq(min(x), max(x), length.out = input$bins + 1)
     mycolor <- rgb(input$myR_edad,input$myG_edad,input$myB_edad,maxColorValue = 255)
@@ -34,7 +51,7 @@ shinyServer(function(input, output) {
   )
   ### plot and download: Sexo
   plotInputSexo<-function(){
-    col <- 12 # sexo
+    col <- 12 # factor sexo
     x    <- cuest[,col]
     mycolor <- rgb(input$myR_sexo,input$myG_sexo,input$myB_sexo,maxColorValue = 255)
     barplot(table(x), col = mycolor, border = 'white',main=names(cuest)[col])
