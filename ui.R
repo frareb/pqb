@@ -2,7 +2,7 @@ library(shiny)
 
 # Define UI for application that draws a barplot
 shinyUI(fluidPage(
-  titlePanel("Base de datos de agricultores ()"),
+  titlePanel("Base de datos de agricultores"),
   tabsetPanel(
     tabPanel("Agricultores",
              tabsetPanel(
