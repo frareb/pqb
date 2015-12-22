@@ -1,8 +1,6 @@
 library(shiny)
 library(plotrix)
 
-# setwd("/home/irdfr/Bureau/R_cap7_3/App-1")
-
 archivo<-"data/cuestionarioquinuarjj-2015-12-01-11-58-53.csv"
 tipoDatos<-c("factor","factor","Date","factor","factor","factor","factor","factor",
              "factor","character","character","factor","integer","character","factor",
