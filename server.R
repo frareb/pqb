@@ -9,9 +9,7 @@ tipoDatos<-c("factor","factor","Date","factor","factor","factor","factor","facto
              rep("character",265-29))
 cuest<-read.table(archivo,sep=',',header=TRUE,na="n/a",colClasses=tipoDatos,encoding="UTF-8")
 
-# AGRI: edad(13) ; sexo(12) ; smartphone (15)
-#barplot(table(cuest[,15]),main="Smartphone")
-#plot(cuest[,15]~cuest[,13],xlab="Edad",ylab="Smartphone") # tiene samrtphone = f(edad)
+# AGRI: edad(13) ; sexo(12) ; smartphone (15) ; 
 
 
 shinyServer(function(input, output) {
