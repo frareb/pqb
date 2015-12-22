@@ -1,6 +1,8 @@
 library(shiny)
 library(plotrix)
 
+# setwd("/home/irdfr/Bureau/R_cap7_3/App-1")
+
 archivo<-"data/cuestionarioquinuarjj-2015-12-01-11-58-53.csv"
 tipoDatos<-c("factor","factor","Date","factor","factor","factor","factor","factor",
              "factor","character","character","factor","integer","character","factor",
@@ -43,8 +45,27 @@ shinyServer(function(input, output) {
   output$downloadPlotSexo <- downloadHandler(
     filename = function(){paste0("agri_sexo",".png")},
     content = function(file){
-      png(file,width=800,height=600)
+      png(file,width=600,height=800)
       plotInputSexo()
+      dev.off()
+    }
+  )
+  ### plot and download: Sexo_Edad
+  plotInputSexoEdad<-function(){
+    datos<-table(cuest[,13],cuest[,12])
+    xy.pop<-datos[,2]
+    xx.pop<-datos[,1]
+    agelabels<-names(datos[,2])
+    mcol<-color.gradient(c(0,0,0.5,1),c(0,0,0.5,1),c(1,1,0.5,1),length(datos[,2]))
+    fcol<-color.gradient(c(1,1,0.5,1),c(0.5,0.5,0.5,1),c(0.5,0.5,0.5,1),length(datos[,2]))
+    par(mar=pyramid.plot(xx.pop,xy.pop,lxcol=mcol,rxcol=fcol,gap=0.5,show.values=FALSE,labels=agelabels))
+  }
+  output$plotSexoEdad <- renderPlot({ plotInputSexoEdad() })
+  output$downloadPlotSexoEdad <- downloadHandler(
+    filename = function(){paste0("agri_sexo_edad",".png")},
+    content = function(file){
+      png(file,width=600,height=800)
+      plotInputSexoEdad()
       dev.off()
     }
   )
