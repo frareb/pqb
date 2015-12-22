@@ -1,4 +1,7 @@
 library(shiny)
+library(plotrix)
+
+# setwd("/home/irdfr/Bureau/R_cap7_3/App-1")
 
 archivo<-"data/cuestionarioquinuarjj-2015-12-01-11-58-53.csv"
 tipoDatos<-c("factor","factor","Date","factor","factor","factor","factor","factor",
@@ -7,6 +10,10 @@ tipoDatos<-c("factor","factor","Date","factor","factor","factor","factor","facto
              "factor","factor","character","numeric","numeric","numeric","numeric",
              rep("character",265-29))
 cuest<-read.table(archivo,sep=',',header=TRUE,na="n/a",colClasses=tipoDatos,encoding="UTF-8")
+
+# AGRI: edad(13) ; sexo(12) ; smartphone (15)
+#barplot(table(cuest[,15]),main="Smartphone")
+#plot(cuest[,15]~cuest[,13],xlab="Edad",ylab="Smartphone") # tiene samrtphone = f(edad)
 
 
 shinyServer(function(input, output) {
