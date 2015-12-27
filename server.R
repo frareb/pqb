@@ -11,9 +11,6 @@ cuest<-read.table(archivo,sep=',',header=TRUE,na="n/a",colClasses=tipoDatos,enco
 
 # AGRI: edad(13) ; sexo(12) ; smartphone (15) ; 
 
-
-
-
 shinyServer(function(input, output) {
   
   #' Make a simple plot in shiny-server.
@@ -60,6 +57,55 @@ shinyServer(function(input, output) {
     )
   }
   
+  #' Make an histogram in shiny-server.
+  #' 
+  #' \code{newHist} allows to build an histogram in shiny.
+  #' @param plotName The name of the plot.
+  #' @param dataset The dataset for the histogram.
+  #' @param isBins A logical to specify if number of breaks is user-defined.
+  #' @param isRGB A logical to specify if colors are user-defined.
+  #' @param isDensity A logical to specify if density should be drawn.
+  #' @param isDownload A logical to specify if export to PNG option should be available.
+  #' @param mwidth The width of the plot to be downloaded in pixels.
+  #' @param mheight The height of the plot to be downloaded in pixels.
+  #' @return NULL.
+  #' @examples
+  #' \dontrun{
+  #' newHist(plotName="myNewPlot",dataset=rnorm(100,mean=0,sd=1),isBins=FALSE,isRGB=FALSE,isDensity=TRUE,isDownload=FALSE,mwidth=800,mheight=600)
+  #' }
+  newHist<-function(plotName,dataset,isBins=TRUE,isRGB=TRUE,isDensity=TRUE,isDownload=TRUE,mwidth=800,mheight=600){
+    plotInputName<-paste0("plotInput",plotName)
+    plotOutputName<-paste0("plot",plotName)
+    if(isDownload==TRUE){
+      buttonDownloadName<-paste0("downloadPlot",plotName)
+      pngName<-paste0(plotName,".png")
+    }
+    assign(plotInputName,function(){
+      if(isBins==TRUE){
+        bins <- seq(as.integer(min(dataset,na.rm=TRUE)), as.integer(max(dataset,na.rm=TRUE)),length.out = input[[paste0(plotName,"bins")]] + 1)
+      }else{bins<-"Sturges"}
+      if(isRGB==TRUE){
+        mycolor <- rgb(input[[paste0("R",plotName)]],input[[paste0("G",plotName)]],input[[paste0("B",plotName)]],maxColorValue = 255)
+      } else {mycolor <- 0}
+      hist(dataset,breaks=bins,freq=FALSE,col=mycolor,main=plotName)
+      if(isDensity==TRUE){points(density(dataset),type='l',lwd=2)}
+    })
+    output[[get('plotOutputName')]]<-renderPlot({ get(get('plotInputName'))() })
+    if(isDownload==TRUE){
+      output[[get('buttonDownloadName')]]<-downloadHandler(
+        filename = function(){
+          pngName
+        },
+        content = function(file){
+          png(file,width=mwidth,height=mheight)
+          get(get('plotInputName'))()
+          dev.off()
+        }
+      )
+    }
+  }
+  
+  
   #  ### plot smartphone (old procedure)
   #   plotInputSmart <- function(){
   #     col <- 15 # logical smartphone
@@ -88,14 +134,17 @@ shinyServer(function(input, output) {
     plot(cuest[,15]~cuest[,13],xlab="Edad",ylab="Smartphone")
   })
 
-  ### plot and download: Edad
-  newPlot(plotName="Edad",funPlot=function(){
-    col <- 13 # integer edad
-    x    <- cuest[,col]
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    mycolor <- rgb(input$myR_edad,input$myG_edad,input$myB_edad,maxColorValue = 255)
-    hist(x, breaks = bins, col = mycolor, border = 'white',main=names(cuest)[col])
-  })
+#  ### plot: Edad (old procedure)
+#   newPlot(plotName="Edad",funPlot=function(){
+#     col <- 13 # integer edad
+#     x    <- cuest[,col]
+#     bins <- seq(min(x), max(x), length.out = input$bins + 1)
+#     mycolor <- rgb(input$myR_edad,input$myG_edad,input$myB_edad,maxColorValue = 255)
+#     hist(x, breaks = bins, col = mycolor, border = 'white',main=names(cuest)[col])
+#   })
+  
+  ### plot: Edad
+  newHist(plotName="Edad",dataset=cuest[,13],isBins=TRUE,isRGB=TRUE,isDensity=TRUE,isDownload=TRUE,mwidth=800,mheight=600)
 
   ### plot and download: Sexo
   newPlot(plotName="Sexo",funPlot=function(){
