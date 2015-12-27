@@ -16,7 +16,32 @@ cuest<-read.table(archivo,sep=',',header=TRUE,na="n/a",colClasses=tipoDatos,enco
 
 shinyServer(function(input, output) {
   
-  newPlot<-function(plotName,funPlot){
+  #' Make a simple plot in shiny-server.
+  #' 
+  #' \code{newPlot} allows to build a plot in shiny with a download button for PNG export.
+  #' @param plotName The name of the plot.
+  #' @param funPlot A function which contain the code to build the plot, see examples.
+  #' @param mwidth The width of the plot to be downloaded in pixels.
+  #' @param mheight The height of the plot to be downloaded in pixels.
+  #' @return NULL.
+  #' @examples
+  #' \dontrun{
+  #' newPlot(plotName="myNewPlot",funPlotfunction(){plot(1)},mwidth=800,mheight=600)
+  #' }
+  #' @details \code{newPlot} computes a plot input name starting with "plotInput"
+  #'   with the name of the plot as a suffix, a plot output name starting with 
+  #'   "plot" with the name of the plot as a suffix, a download button name 
+  #'   starting with "downloadPlot" with the name of the plot as a suffix, and
+  #'   a PNG file name with the same name as the \code{plotName}. These names
+  #'   can later be used in the ui file to organize the layout.
+  #'   The example above will create a simple plot \code{plot(1)} with 
+  #'   plotInputmyNewPlot as plot input name,
+  #'   plotmyNewPlot as plot output name,
+  #'   downloadPlotmyNewPlot as download button name, and
+  #'   myNewPlot.png as plot export name.
+  #'   The counterpart in ui file could look like the following:
+  #'   \code{column(4,plotOutput("plotmyNewPlot"),downloadButton('downloadPlotmyNewPlot','PNG'))}.
+  newPlot<-function(plotName,funPlot,mwidth=800,mheight=600){
     plotInputName<-paste0("plotInput",plotName)
     plotOutputName<-paste0("plot",plotName)
     buttonDownloadName<-paste0("downloadPlot",plotName)
@@ -28,7 +53,7 @@ shinyServer(function(input, output) {
         pngName
       },
       content = function(file){
-        png(file,width=800,height=600)
+        png(file,width=mwidth,height=mheight)
         get(get('plotInputName'))()
         dev.off()
       }
