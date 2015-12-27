@@ -16,83 +16,72 @@ cuest<-read.table(archivo,sep=',',header=TRUE,na="n/a",colClasses=tipoDatos,enco
 
 shinyServer(function(input, output) {
   
-  newPlot<-function(plotInputName,funPlot,plotOutputName,buttonDownloadName,pngName){ ### to create new plots
+  newPlot<-function(plotName,funPlot){
+    plotInputName<-paste0("plotInput",plotName)
+    plotOutputName<-paste0("plot",plotName)
+    buttonDownloadName<-paste0("downloadPlot",plotName)
+    pngName<-paste0(plotName,".png")
     assign(plotInputName,funPlot)
     output[[get('plotOutputName')]]<-renderPlot({ get(get('plotInputName'))() })
     output[[get('buttonDownloadName')]]<-downloadHandler(
       filename = function(){
         pngName
       },
-        content = function(file){
+      content = function(file){
         png(file,width=800,height=600)
-          get(get('plotInputName'))()
+        get(get('plotInputName'))()
         dev.off()
       }
     )
   }
   
+  #  ### plot smartphone (old procedure)
+  #   plotInputSmart <- function(){
+  #     col <- 15 # logical smartphone
+  #     x    <- cuest[,col]
+  #     par(mfrow=c(1,2))
+  #     barplot(table(cuest[,15]),main="Smartphone")
+  #     plot(cuest[,15]~cuest[,13],xlab="Edad",ylab="Smartphone")
+  #   }
+  #   output$plotSmart <- renderPlot({ plotInputSmart() })
+  #   output$downloadPlotSmart <- downloadHandler(
+  #     filename = function(){paste0("agri_smart",".png")},
+  #     content = function(file){
+  #       png(file,width=800,height=600)
+  #       plotInputSmart()
+  #       dev.off()
+  #     }
+  #   )  
+  
   ### plot smartphone
-  newPlot(plotInputName="plotInputSmart",funPlot=function(){
+  newPlot(plotName="Smart",funPlot=function(){
     barplot(table(cuest[,15]),main="Smartphone")
-  },plotOutputName="plotSmart",buttonDownloadName="downloadPlotSmart",pngName="agri_smart.png")
+  })
   
   ### plot smartphone = f(Edad)
-  newPlot(plotInputName="plotInputSmartEdad",funPlot=function(){
+  newPlot(plotName="SmartEdad",funPlot=function(){
     plot(cuest[,15]~cuest[,13],xlab="Edad",ylab="Smartphone")
-  },plotOutputName="plotSmartEdad",buttonDownloadName="downloadPlotSmartEdad",pngName="agri_smartEdad.png")
-  
-  ### plot smartphone (old procedure)
-#   plotInputSmart <- function(){
-#     col <- 15 # logical smartphone
-#     x    <- cuest[,col]
-#     par(mfrow=c(1,2))
-#     barplot(table(cuest[,15]),main="Smartphone")
-#     plot(cuest[,15]~cuest[,13],xlab="Edad",ylab="Smartphone")
-#   }
-#   output$plotSmart <- renderPlot({ plotInputSmart() })
-#   output$downloadPlotSmart <- downloadHandler(
-#     filename = function(){paste0("agri_smart",".png")},
-#     content = function(file){
-#       png(file,width=800,height=600)
-#       plotInputSmart()
-#       dev.off()
-#     }
-#   )
+  })
+
   ### plot and download: Edad
-  plotInputEdad <- function(){
+  newPlot(plotName="Edad",funPlot=function(){
     col <- 13 # integer edad
     x    <- cuest[,col]
     bins <- seq(min(x), max(x), length.out = input$bins + 1)
     mycolor <- rgb(input$myR_edad,input$myG_edad,input$myB_edad,maxColorValue = 255)
     hist(x, breaks = bins, col = mycolor, border = 'white',main=names(cuest)[col])
-  }
-  output$plotEdad <- renderPlot({ plotInputEdad() })
-  output$downloadPlotEdad <- downloadHandler(
-    filename = function(){paste0("agri_edad",".png")},
-    content = function(file){
-      png(file,width=800,height=600)
-      plotInputEdad()
-      dev.off()
-    }
-  )
+  })
+
   ### plot and download: Sexo
-  plotInputSexo<-function(){
+  newPlot(plotName="Sexo",funPlot=function(){
     col <- 12 # factor sexo
     x    <- cuest[,col]
     mycolor <- rgb(input$myR_sexo,input$myG_sexo,input$myB_sexo,maxColorValue = 255)
     barplot(table(x), col = mycolor, border = 'white',main=names(cuest)[col])
-  }
-  output$plotSexo <- renderPlot({ plotInputSexo() })
-  output$downloadPlotSexo <- downloadHandler(
-    filename = function(){paste0("agri_sexo",".png")},
-    content = function(file){
-      png(file,width=600,height=800)
-      plotInputSexo()
-      dev.off()
-    }
-  )
+  })
+  
   ### plot and download: Sexo_Edad
-  plotInputSexoEdad<-function(){
+  newPlot(plotName="SexoEdad",funPlot=function(){
     datos<-table(cuest[,13],cuest[,12])
     xy.pop<-datos[,2]
     xx.pop<-datos[,1]
@@ -100,14 +89,6 @@ shinyServer(function(input, output) {
     mcol<-color.gradient(c(0,0,0.5,1),c(0,0,0.5,1),c(1,1,0.5,1),length(datos[,2]))
     fcol<-color.gradient(c(1,1,0.5,1),c(0.5,0.5,0.5,1),c(0.5,0.5,0.5,1),length(datos[,2]))
     par(mar=pyramid.plot(xx.pop,xy.pop,lxcol=mcol,rxcol=fcol,gap=0.5,show.values=FALSE,labels=agelabels))
-  }
-  output$plotSexoEdad <- renderPlot({ plotInputSexoEdad() })
-  output$downloadPlotSexoEdad <- downloadHandler(
-    filename = function(){paste0("agri_sexo_edad",".png")},
-    content = function(file){
-      png(file,width=600,height=800)
-      plotInputSexoEdad()
-      dev.off()
-    }
-  )
+  })
+  
 })
