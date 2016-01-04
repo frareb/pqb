@@ -13,7 +13,7 @@ cuest<-read.table(archivo,sep=',',header=TRUE,na="n/a",colClasses=tipoDatos,enco
 
 shinyServer(function(input, output) {
   
-  source("server_fun.R")
+  source("server_fun.R", local=TRUE)
   
   ### plot smartphone
   newPlot(plotName="Smart",funPlot=function(){
