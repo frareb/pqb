@@ -93,9 +93,7 @@ shinyServer(function(input, output) {
     output[[get('plotOutputName')]]<-renderPlot({ get(get('plotInputName'))() })
     if(isDownload==TRUE){
       output[[get('buttonDownloadName')]]<-downloadHandler(
-        filename = function(){
-          pngName
-        },
+        filename = function(){pngName},
         content = function(file){
           png(file,width=mwidth,height=mheight)
           get(get('plotInputName'))()
@@ -104,8 +102,6 @@ shinyServer(function(input, output) {
       )
     }
   }
-  
-  
   #  ### plot smartphone (old procedure)
   #   plotInputSmart <- function(){
   #     col <- 15 # logical smartphone
