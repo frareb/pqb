@@ -5,6 +5,7 @@ source("ui_fun.R")
 
 # Define UI for application that draws a barplot
 shinyUI(fluidPage(
+  # includeCSS("www/style.css"),
   titlePanel("Base de datos de agricultores"),
   tabsetPanel(
     tabPanel("Agricultores",
@@ -29,7 +30,24 @@ shinyUI(fluidPage(
          )
       )
     ),
-    tabPanel("Sistema productivo"),
+    tabPanel("Sistema productivo",
+       sidebarLayout(
+         sidebarPanel(
+           radioButtons(
+             "variables", "Variables", list("Afiliacion"="afiliacion","N° parcelas"="parcelas" )
+           ),
+           uiOutput("reacDepartamento"),
+           conditionalPanel(
+             condition = "input.variables == 'afiliacion'",
+             uiOutput("reacMunicipio")
+           )
+         ),
+         
+         mainPanel(
+           plotOutput("barPlotAfiliacion")
+         )
+       )
+    ),
     tabPanel("Variedades")
   )
 ))
