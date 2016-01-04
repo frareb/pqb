@@ -1,7 +1,7 @@
 library(shiny)
 library(plotrix)
 
-archivo<-"data/cuestionarioquinuarjj-2015-12-01-11-58-53.csv"
+archivo<-"data/cuestionarioquinuarjj-2016-01-04-18-03-29.csv"
 tipoDatos<-c("factor","factor","Date","factor","factor","factor","factor","factor",
              "factor","character","character","factor","integer","character","factor",
              "logical","logical","logical","logical","logical","factor","factor",
@@ -26,9 +26,9 @@ shinyServer(function(input, output) {
   })
   
   ### plot: Edad
-  newHist(plotName="Edad",dataset=cuest[,13],isBins=TRUE,isRGB=TRUE,isDensity=TRUE,isDownload=TRUE,mwidth=800,mheight=600)
+  newHist(plotName="Edad",dataset=cuest[,13],isBins=TRUE,isRGB=TRUE,isDensity=TRUE,isDownload=TRUE)
 
-  ### plot and download: Sexo
+  ### plot: Sexo
   newPlot(plotName="Sexo",funPlot=function(){
     col <- 12 # factor sexo
     x    <- cuest[,col]
@@ -49,7 +49,7 @@ shinyServer(function(input, output) {
   
   ### Reactive UI
   output$reacDepartamento <- renderUI({
-    departamentoList =  unique(as.character(cuest$seccion_a.departamento))
+    departamentoList =  c("TODOS",unique(as.character(cuest$seccion_a.departamento)))
     selectInput("departamento", "Departamento", departamentoList)
   })
   output$reacMunicipio <- renderUI({
@@ -59,17 +59,15 @@ shinyServer(function(input, output) {
   output$barPlotAfiliacion <- renderPlot({
     if(input$variables == "afiliacion"){
       dataMunicipio <- cuest[cuest$seccion_a.municipio == input$municipio,]
-      asociacion<-length(dataMunicipio$seccion_a.afiliaciones.asociacion[dataMunicipio$seccion_a.afiliaciones.asociacion == TRUE])
-      empresa<-length(dataMunicipio$seccion_a.afiliaciones.empresa[dataMunicipio$seccion_a.afiliaciones.empresa == TRUE])
-      indepediente<-length(dataMunicipio$seccion_a.afiliaciones.independiente[dataMunicipio$seccion_a.afiliaciones.independiente == TRUE])
-      camara<-length(dataMunicipio$seccion_a.afiliaciones.camara[dataMunicipio$seccion_a.afiliaciones.camara == TRUE])
-      bp <- cbind(asociacion,empresa,indepediente,camara)
-      par(bg="#ebf0fb", col.axis="#3f4f78",col.lab="#3f4f78", cex=1.2)
+      bp<-apply(dataMunicipio[,16:20],MARGIN=2,FUN=sum,na.rm=TRUE)
+      names(bp)<-sapply(strsplit(names(bp),split="\\."),"[[",3)
+      # par(bg="#ebf0fb", col.axis="#3f4f78",col.lab="#3f4f78", cex=1.2) # a definir au niveau global
       barplot(bp, names.arg=colnames(bp), col="#3f4f78")
     }
     if(input$variables == "parcelas"){
       dataDepartamento <- data.frame(cuest$seccion_a.municipio[cuest$seccion_a.departamento == input$departamento],cuest$seccion_a.parcela[cuest$seccion_a.departamento == input$departamento])
-      par(bg="#ebf0fb", col.axis="#3f4f78",col.lab="#3f4f78", cex=1.2, mar=c(8,4,4,4))
+      # par(bg="#ebf0fb", col.axis="#3f4f78",col.lab="#3f4f78", cex=1.2, mar=c(8,4,4,4)) # a definir au niveau global
+      par(mar=c(8,4,4,4))
       boxplot(as.numeric(dataDepartamento[,2]) ~ as.character(dataDepartamento[,1]), las=2,border="#3f4f78", frame=FALSE, xaxt='n',yaxt='n')
       axis(1,at=1:length(unique(as.character(dataDepartamento[,1]))),labels=unique(as.character(dataDepartamento[,1])), lwd=0, las=2)
       axis(2,ylim=seq(from=0, to=max(as.numeric(dataDepartamento[,2])),length.out = 4) ,lwd=1, col="#3f4f78")
