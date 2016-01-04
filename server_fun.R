@@ -3,8 +3,6 @@
 #' \code{newPlot} allows to build a plot in shiny with a download button for PNG export.
 #' @param plotName The name of the plot.
 #' @param funPlot A function which contain the code to build the plot, see examples.
-#' @param mwidth The width of the plot to be downloaded in pixels.
-#' @param mheight The height of the plot to be downloaded in pixels.
 #' @return NULL.
 #' @examples
 #' \dontrun{
@@ -23,11 +21,31 @@
 #'   myNewPlot.png as plot export name.
 #'   The counterpart in ui file could look like the following:
 #'   \code{column(4,plotOutput("plotmyNewPlot"),downloadButton('downloadPlotmyNewPlot','PNG'))}.
-newPlot<-function(plotName,funPlot,mwidth=800,mheight=600){
+# newPlot<-function(plotName,funPlot,mwidth=800,mheight=600){
+#   plotInputName<-paste0("plotInput",plotName)
+#   plotOutputName<-paste0("plot",plotName)
+#   buttonDownloadName<-paste0("downloadPlot",plotName)
+#   pngName<-paste0(plotName,".png")
+#   assign(plotInputName,funPlot)
+#   output[[get('plotOutputName')]]<-renderPlot({ get(get('plotInputName'))() })
+#   output[[get('buttonDownloadName')]]<-downloadHandler(
+#     filename = function(){
+#       pngName
+#     },
+#     content = function(file){
+#       png(file,width=mwidth,height=mheight)
+#       get(get('plotInputName'))()
+#       dev.off()
+#     }
+#   )
+# }
+newPlot<-function(plotName,funPlot){
   plotInputName<-paste0("plotInput",plotName)
   plotOutputName<-paste0("plot",plotName)
   buttonDownloadName<-paste0("downloadPlot",plotName)
   pngName<-paste0(plotName,".png")
+  iwidth<-paste0("width",plotName)
+  iheight<-paste0("height",plotName)
   assign(plotInputName,funPlot)
   output[[get('plotOutputName')]]<-renderPlot({ get(get('plotInputName'))() })
   output[[get('buttonDownloadName')]]<-downloadHandler(
@@ -35,7 +53,7 @@ newPlot<-function(plotName,funPlot,mwidth=800,mheight=600){
       pngName
     },
     content = function(file){
-      png(file,width=mwidth,height=mheight)
+      png(file,width=as.integer(input[[get('iwidth')]]),height=as.integer(input[[get('iheight')]]) )
       get(get('plotInputName'))()
       dev.off()
     }
@@ -51,19 +69,19 @@ newPlot<-function(plotName,funPlot,mwidth=800,mheight=600){
 #' @param isRGB A logical to specify if colors are user-defined.
 #' @param isDensity A logical to specify if density should be drawn.
 #' @param isDownload A logical to specify if export to PNG option should be available.
-#' @param mwidth The width of the plot to be downloaded in pixels.
-#' @param mheight The height of the plot to be downloaded in pixels.
 #' @return NULL.
 #' @examples
 #' \dontrun{
 #' newHist(plotName="myNewPlot",dataset=rnorm(100,mean=0,sd=1),isBins=FALSE,isRGB=FALSE,isDensity=TRUE,isDownload=FALSE,mwidth=800,mheight=600)
 #' }
-newHist<-function(plotName,dataset,isBins=TRUE,isRGB=TRUE,isDensity=TRUE,isDownload=TRUE,mwidth=800,mheight=600){
+newHist<-function(plotName,dataset,isBins=TRUE,isRGB=TRUE,isDensity=TRUE,isDownload=TRUE){
   plotInputName<-paste0("plotInput",plotName)
   plotOutputName<-paste0("plot",plotName)
   if(isDownload==TRUE){
     buttonDownloadName<-paste0("downloadPlot",plotName)
     pngName<-paste0(plotName,".png")
+    iwidth<-paste0("width",plotName)
+    iheight<-paste0("height",plotName)
   }
   assign(plotInputName,function(){
     if(isBins==TRUE){
@@ -80,7 +98,7 @@ newHist<-function(plotName,dataset,isBins=TRUE,isRGB=TRUE,isDensity=TRUE,isDownl
     output[[get('buttonDownloadName')]]<-downloadHandler(
       filename = function(){pngName},
       content = function(file){
-        png(file,width=mwidth,height=mheight)
+        png(file,width=as.integer(input[[get('iwidth')]]),height=as.integer(input[[get('iheight')]]))
         get(get('plotInputName'))()
         dev.off()
       }
