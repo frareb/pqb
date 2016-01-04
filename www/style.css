@@ -1,0 +1,24 @@
+h2{
+  font-family:Georgia;
+  padding:15px;
+  text-align:center;
+  border-bottom:1px solid #d0d9ef;
+  margin-bottom:15px;
+  margin-top:0;
+}
+
+.well{
+  background-color:#ebf0fb;
+  border:1px solid #d0d9ef;
+   border-radius:10px;
+}
+body{
+  font-family:Georgia;
+  color:#3f4f78;
+}
+img, .selectize-input{
+  border:1px solid #d0d9ef;
+  border-radius:10px;
+    font-family:Georgia;
+
+}
