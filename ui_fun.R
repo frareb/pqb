@@ -10,6 +10,28 @@ dispNewHist<-function(plotName,isBins=TRUE,isRGB=TRUE,isDownload=TRUE,optColWidt
       if(isRGB==TRUE){sliderInput(paste0("B",plotName),bTitle, min = 0, max = 255, value = 50)}
     )
     ),
-    if(isDownload==TRUE){column(plotColWidth,plotOutput(paste0("plot",plotName)),downloadButton(paste0("downloadPlot",plotName),downloadTitle))}
+    column(plotColWidth,plotOutput(paste0("plot",plotName)),
+    if(isDownload==TRUE){
+       # downloadButton(paste0("downloadPlot",plotName),downloadTitle)
+      fluidRow(
+        column(4,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
+        column(4,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
+        column(4,downloadButton(paste0("downloadPlot",plotName),"Desc."))
+      )
+    })
   ))
+}
+
+#' Make a plot in shiny-ui.
+#' 
+#' \code{dispNewPlot} allows to display an histogram in shiny within a \code{fluidRow}.
+dispNewPlot<-function(plotName,colWidth=6){
+  return(
+    column(colWidth,plotOutput(paste0("plot",plotName)),
+     fluidRow(
+       column(4,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
+       column(4,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
+       column(4,downloadButton(paste0("downloadPlot",plotName),"Desc."))
+     ))
+  )
 }
