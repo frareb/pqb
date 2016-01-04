@@ -1,5 +1,22 @@
 library(shiny)
 
+#' Make an histogram in shiny-ui.
+#' 
+#' \code{dispNewHist} allows to display an histogram in shiny within a \code{fluidPage} with some basic options on the right panel.
+dispNewHist<-function(plotName,isBins=TRUE,isRGB=TRUE,isDownload=TRUE,optColWidth=3,plotColWidth=9,mtitle="",binsTitle="Number of bars",rTitle="R:",gTitle="G:",bTitle="B:",downloadTitle="Download"){
+  return(fluidRow(
+    column(optColWidth,wellPanel(mtitle,
+      if(isBins==TRUE){sliderInput(paste0(plotName,"bins"), binsTitle, min = 1, max = 50, value = 30)},
+      if(isRGB==TRUE){sliderInput(paste0("R",plotName),rTitle, min = 0, max = 255, value = 50)},
+      if(isRGB==TRUE){sliderInput(paste0("G",plotName),gTitle, min = 0, max = 255, value = 50)},
+      if(isRGB==TRUE){sliderInput(paste0("B",plotName),bTitle, min = 0, max = 255, value = 50)}
+    )
+    ),
+    if(isDownload==TRUE){column(plotColWidth,plotOutput(paste0("plot",plotName)),downloadButton(paste0("downloadPlot",plotName),downloadTitle))}
+  ))
+}
+
+
 # Define UI for application that draws a barplot
 shinyUI(fluidPage(
   titlePanel("Base de datos de agricultores"),
@@ -7,16 +24,7 @@ shinyUI(fluidPage(
     tabPanel("Agricultores",
       tabsetPanel(
          tabPanel("Perso.",
-            fluidRow(
-              column(3,wellPanel("Opciones del grafico:",
-                 sliderInput("Edadbins", "Numero de barras:", min = 1, max = 50, value = 30),
-                 sliderInput("REdad","Color R:", min = 0, max = 255, value = 50),
-                 sliderInput("GEdad","Color G:", min = 0, max = 255, value = 50),
-                 sliderInput("BEdad","Color B:", min = 0, max = 255, value = 50))
-              ),
-              column(9,plotOutput("plotEdad"),downloadButton('downloadPlotEdad','Descargar')
-              )
-            ),
+            dispNewHist(plotName="Edad",isBins=TRUE,isRGB=TRUE,isDownload=TRUE,optColWidth=3,plotColWidth=9,mtitle="Opciones del grafico",binsTitle="Numero de barras",rTitle="R:",gTitle="G:",bTitle="B:",downloadTitle="Descargar PNG"),
             fluidRow(
               column(3,wellPanel("Opciones del grafico:",
                  sliderInput("myR_sexo","Color R:", min = 0, max = 255, value = 50),
