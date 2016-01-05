@@ -55,7 +55,7 @@ shinyUI(fluidPage(
     tabPanel("Agricultores",
       tabsetPanel(
          tabPanel("Perso.",
-            dispNewHist(plotName="Edad",isBins=TRUE,isRGB=TRUE,isDownload=TRUE,optColWidth=3,plotColWidth=9,mtitle="Opciones del grafico",binsTitle="Numero de barras",rTitle="R:",gTitle="G:",bTitle="B:",downloadTitle="Descargar PNG"),
+            dispNewHist(plotName="Edad",isBins=TRUE,isRGB=TRUE,isDownload=TRUE,optColWidth=3,plotColWidth=9,mtitle="Opciones del grafico",binsTitle="Numero de barras",rTitle="R:",gTitle="G:",bTitle="B:",downloadTitle="Desc."),
             fluidRow(
               column(3,wellPanel("Opciones del grafico:",
                  sliderInput("myR_sexo","Color R:", min = 0, max = 255, value = 50),
@@ -131,7 +131,7 @@ shinyUI(fluidPage(
          ),
          fluidRow(
            column(3,wellPanel("Opciones del grafico:",
-              sliderInput("RVar1","Color R:", min = 0, max = 255, value = 150),
+              sliderInput("RVar1","Color R:", min = 0, max = 255, value = 255),
               sliderInput("GVar1","Color G:", min = 0, max = 255, value = 150),
               sliderInput("BVar1","Color B:", min = 0, max = 255, value = 200))
            ),
@@ -139,7 +139,7 @@ shinyUI(fluidPage(
          ),
          fluidRow(
            column(3,wellPanel("Opciones del grafico:",
-                              sliderInput("RVar2","Color R:", min = 0, max = 255, value = 150),
+                              sliderInput("RVar2","Color R:", min = 0, max = 255, value = 0),
                               sliderInput("GVar2","Color G:", min = 0, max = 255, value = 150),
                               sliderInput("BVar2","Color B:", min = 0, max = 255, value = 200))
            ),
@@ -147,12 +147,19 @@ shinyUI(fluidPage(
          ),
          fluidRow(
            column(3,wellPanel("Opciones del grafico:",
-                              sliderInput("RVar3","Color R:", min = 0, max = 255, value = 150),
+                              sliderInput("RVar3","Color R:", min = 0, max = 255, value = 0),
                               sliderInput("GVar3","Color G:", min = 0, max = 255, value = 150),
-                              sliderInput("BVar3","Color B:", min = 0, max = 255, value = 200))
+                              sliderInput("BVar3","Color B:", min = 0, max = 255, value = 55))
            ),
            dispNewPlot("Var3",colWidth=9)
          )
+        ),
+        tabPanel("Siembra",
+          h2("Fecha de siembra"),
+          dispNewHist(plotName="Fecha de siembra - Bolivia (2015)",isBins=FALSE,isRGB=TRUE,isDownload=TRUE,optColWidth=3,plotColWidth=9,mtitle="Opciones del grafico",rTitle="R:",gTitle="G:",bTitle="B:",downloadTitle="Desc."),
+          dispNewHist(plotName="Fecha de siembra - La Paz",isBins=FALSE,isRGB=TRUE,isDownload=TRUE,optColWidth=3,plotColWidth=9,mtitle="Opciones del grafico",rTitle="R:",gTitle="G:",bTitle="B:",downloadTitle="Desc."),
+          dispNewHist(plotName="Fecha de siembra - Oruro",isBins=FALSE,isRGB=TRUE,isDownload=TRUE,optColWidth=3,plotColWidth=9,mtitle="Opciones del grafico",rTitle="R:",gTitle="G:",bTitle="B:",downloadTitle="Desc."),
+          dispNewHist(plotName="Fecha de siembra - Potosi",isBins=FALSE,isRGB=TRUE,isDownload=TRUE,optColWidth=3,plotColWidth=9,mtitle="Opciones del grafico",rTitle="R:",gTitle="G:",bTitle="B:",downloadTitle="Desc.")
         )
       )
     ),
