@@ -3,6 +3,7 @@
 #' \code{newPlot} allows to build a plot in shiny with a download button for PNG export.
 #' @param plotName The name of the plot.
 #' @param funPlot A function which contain the code to build the plot, see examples.
+#' @param xheight Height of the plot in pixels.
 #' @return NULL.
 #' @examples
 #' \dontrun{
@@ -21,7 +22,7 @@
 #'   myNewPlot.png as plot export name.
 #'   The counterpart in ui file could look like the following:
 #'   \code{column(4,plotOutput("plotmyNewPlot"),downloadButton('downloadPlotmyNewPlot','PNG'))}.
-# newPlot<-function(plotName,funPlot,mwidth=800,mheight=600){
+# newPlot<-function(plotName,funPlot){
 #   plotInputName<-paste0("plotInput",plotName)
 #   plotOutputName<-paste0("plot",plotName)
 #   buttonDownloadName<-paste0("downloadPlot",plotName)
@@ -39,7 +40,7 @@
 #     }
 #   )
 # }
-newPlot<-function(plotName,funPlot){
+newPlot<-function(plotName,funPlot,xheight=400){
   plotInputName<-paste0("plotInput",plotName)
   plotOutputName<-paste0("plot",plotName)
   buttonDownloadName<-paste0("downloadPlot",plotName)
@@ -47,7 +48,7 @@ newPlot<-function(plotName,funPlot){
   iwidth<-paste0("width",plotName)
   iheight<-paste0("height",plotName)
   assign(plotInputName,funPlot)
-  output[[get('plotOutputName')]]<-renderPlot({ get(get('plotInputName'))() })
+  output[[get('plotOutputName')]]<-renderPlot({ get(get('plotInputName'))() }, height=xheight)
   output[[get('buttonDownloadName')]]<-downloadHandler(
     filename = function(){
       pngName
