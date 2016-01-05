@@ -1,6 +1,7 @@
 #' Make an histogram in shiny-ui.
 #' 
-#' \code{dispNewHist} allows to display an histogram in shiny within a \code{fluidPage} with some basic options on the right panel.
+#' \code{dispNewHist} allows to display an histogram in shiny within a \code{fluidPage} 
+#'   with some basic options on the right panel.
 dispNewHist<-function(plotName,isBins=TRUE,isRGB=TRUE,isDownload=TRUE,optColWidth=3,plotColWidth=9,mtitle="",binsTitle="Number of bars",rTitle="R:",gTitle="G:",bTitle="B:",downloadTitle="Download"){
   return(fluidRow(
     column(optColWidth,wellPanel(mtitle,
@@ -24,14 +25,26 @@ dispNewHist<-function(plotName,isBins=TRUE,isRGB=TRUE,isDownload=TRUE,optColWidt
 
 #' Make a plot in shiny-ui.
 #' 
-#' \code{dispNewPlot} allows to display an histogram in shiny within a \code{fluidRow}.
-dispNewPlot<-function(plotName,colWidth=6){
+#' \code{dispNewPlot} allows to display an histogram in shiny within a \code{fluidRow}
+#'   followed by two numerical inputs for width and height and a download button.
+dispNewPlot<-function(plotName,colWidth=6,reverse=FALSE){
   return(
-    column(colWidth,plotOutput(paste0("plot",plotName)),
-     fluidRow(
-       column(4,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
-       column(4,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
-       column(4,downloadButton(paste0("downloadPlot",plotName),"Desc."))
-     ))
+    if(reverse==FALSE){
+      column(colWidth,plotOutput(paste0("plot",plotName)),
+       fluidRow(
+         column(4,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
+         column(4,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
+         column(4,downloadButton(paste0("downloadPlot",plotName),"Desc."))
+       ))
+    } else {
+      column(colWidth,
+       fluidRow(
+         column(4,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
+         column(4,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
+         column(4,downloadButton(paste0("downloadPlot",plotName),"Desc."))
+       ),
+         plotOutput(paste0("plot",plotName))
+       )
+    }
   )
 }
