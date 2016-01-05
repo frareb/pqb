@@ -75,7 +75,7 @@ newPlot<-function(plotName,funPlot,xheight=400){
 #' \dontrun{
 #' newHist(plotName="myNewPlot",dataset=rnorm(100,mean=0,sd=1),isBins=FALSE,isRGB=FALSE,isDensity=TRUE,isDownload=FALSE,mwidth=800,mheight=600)
 #' }
-newHist<-function(plotName,dataset,isBins=TRUE,isRGB=TRUE,isDensity=TRUE,isDownload=TRUE){
+newHist<-function(plotName,dataset,isBins=TRUE,isDate=FALSE,isRGB=TRUE,isDensity=TRUE,isDownload=TRUE){
   plotInputName<-paste0("plotInput",plotName)
   plotOutputName<-paste0("plot",plotName)
   if(isDownload==TRUE){
@@ -86,7 +86,11 @@ newHist<-function(plotName,dataset,isBins=TRUE,isRGB=TRUE,isDensity=TRUE,isDownl
   }
   assign(plotInputName,function(){
     if(isBins==TRUE){
-      bins <- seq(as.integer(min(dataset,na.rm=TRUE)), as.integer(max(dataset,na.rm=TRUE)),length.out = input[[paste0(plotName,"bins")]] + 1)
+      if(isDate==TRUE){
+        bins <- "weeks"
+      }else{
+        bins <- seq(as.integer(min(dataset,na.rm=TRUE)), as.integer(max(dataset,na.rm=TRUE)),length.out = input[[paste0(plotName,"bins")]] + 1)
+      }
     }else{bins<-"Sturges"}
     if(isRGB==TRUE){
       mycolor <- rgb(input[[paste0("R",plotName)]],input[[paste0("G",plotName)]],input[[paste0("B",plotName)]],maxColorValue = 255)
