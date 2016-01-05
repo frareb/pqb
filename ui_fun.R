@@ -6,9 +6,9 @@ dispNewHist<-function(plotName,isBins=TRUE,isRGB=TRUE,isDownload=TRUE,optColWidt
   return(fluidRow(
     column(optColWidth,wellPanel(mtitle,
       if(isBins==TRUE){sliderInput(paste0(plotName,"bins"), binsTitle, min = 1, max = 50, value = 30)},
-      if(isRGB==TRUE){sliderInput(paste0("R",plotName),rTitle, min = 0, max = 255, value = 50)},
-      if(isRGB==TRUE){sliderInput(paste0("G",plotName),gTitle, min = 0, max = 255, value = 50)},
-      if(isRGB==TRUE){sliderInput(paste0("B",plotName),bTitle, min = 0, max = 255, value = 50)}
+      if(isRGB==TRUE){sliderInput(paste0("R",plotName),rTitle, min = 0, max = 255, value = 0)},
+      if(isRGB==TRUE){sliderInput(paste0("G",plotName),gTitle, min = 0, max = 255, value = 150)},
+      if(isRGB==TRUE){sliderInput(paste0("B",plotName),bTitle, min = 0, max = 255, value = 55)}
     )
     ),
     column(plotColWidth,plotOutput(paste0("plot",plotName)),
