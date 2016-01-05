@@ -5,38 +5,37 @@ archivo<-"data/cuestionarioquinuarjj-2016-01-04-18-03-29.csv"
 tipoDatos<-c("factor","factor","Date","factor","factor","factor","factor","factor",
              "factor","character","character","factor","integer","character","factor",
              "logical","logical","logical","logical","logical","factor","factor",
-             "factor","factor","character","numeric","numeric","numeric","numeric",
-             rep("character",265-29))
+             "factor","factor","character","numeric","numeric","numeric","numeric", #col 29
+             "factor","numeric","logical","logical","numeric","numeric","numeric", #col 36
+             "logical","logical",
+             rep("character",265-38))
 cuest<-read.table(archivo,sep=',',header=TRUE,na="n/a",colClasses=tipoDatos,encoding="UTF-8")
-
-# AGRI: edad(13) ; sexo(12) ; smartphone (15) ; 
 
 shinyServer(function(input, output) {
   
   source("server_fun.R", local=TRUE)
   
-  ### plot smartphone
+  ### plot: smartphone (15)
   newPlot(plotName="Smart",funPlot=function(){
-    barplot(table(cuest[,15]),main="Smartphone")
+    mycolor <- rgb(input$RSmart,input$GSmart,input$BSmart,maxColorValue = 255)
+    barplot(table(cuest[,15]),main="Smartphone", col = mycolor)
   })
   
-  ### plot smartphone = f(Edad)
+  ### plot smartphone ~ Edad (15;13)
   newPlot(plotName="SmartEdad",funPlot=function(){
     plot(cuest[,15]~cuest[,13],xlab="Edad",ylab="Smartphone")
   })
   
-  ### plot: Edad
+  ### plot: Edad (13)
   newHist(plotName="Edad",dataset=cuest[,13],isBins=TRUE,isRGB=TRUE,isDensity=TRUE,isDownload=TRUE)
 
-  ### plot: Sexo
+  ### plot: Sexo (12)
   newPlot(plotName="Sexo",funPlot=function(){
-    col <- 12 # factor sexo
-    x    <- cuest[,col]
     mycolor <- rgb(input$myR_sexo,input$myG_sexo,input$myB_sexo,maxColorValue = 255)
-    barplot(table(x), col = mycolor, border = 'white',main=names(cuest)[col])
+    barplot(table(cuest[,12]), col = mycolor, border = 'white',main=names(cuest)[12])
   })
   
-  ### plot and download: Sexo_Edad
+  ### plot: Sexo ~ Edad (12;13)
   newPlot(plotName="SexoEdad",funPlot=function(){
     datos<-table(cuest[,13],cuest[,12])
     xy.pop<-datos[,2]
@@ -47,31 +46,142 @@ shinyServer(function(input, output) {
     par(mar=pyramid.plot(xx.pop,xy.pop,lxcol=mcol,rxcol=fcol,gap=0.5,show.values=FALSE,labels=agelabels))
   })
   
-  ### Reactive UI
+  ### plot: Afiliacion (16:20) + (21:24)
   output$reacDepartamento <- renderUI({
     departamentoList =  c("TODOS",unique(as.character(cuest$seccion_a.departamento)))
     selectInput("departamento", "Departamento", departamentoList)
   })
   output$reacMunicipio <- renderUI({
-    municipioList =  unique(as.character(cuest$seccion_a.municipio[cuest$seccion_a.departamento == input$departamento]))
-    selectInput("municipio", "Municipio", municipioList)
+    if(length(input$departamento)>0){
+      municipioList =  c("TODOS",unique(as.character(cuest$seccion_a.municipio[cuest$seccion_a.departamento == input$departamento])))
+      selectInput("municipio", "Municipio", municipioList)
+    }
   })
-  output$barPlotAfiliacion <- renderPlot({
-    if(input$variables == "afiliacion"){
-      dataMunicipio <- cuest[cuest$seccion_a.municipio == input$municipio,]
+  newPlot(plotName="Afiliacion",funPlot=function(){
+    dataMunicipio <- NULL
+    if(length(input$departamento)>0 && input$departamento=="TODOS"){dataMunicipio <- cuest}
+    if(length(input$departamento)>0 && input$departamento!="TODOS"){
+      if(input$municipio!="TODOS"){
+        dataMunicipio <- cuest[cuest$seccion_a.municipio == input$municipio,]
+      } else {
+        dataMunicipio <- cuest[cuest$seccion_a.departamento == input$departamento,]
+      }
+    }
+    if(length(dataMunicipio[,16:20])>0){
       bp<-apply(dataMunicipio[,16:20],MARGIN=2,FUN=sum,na.rm=TRUE)
       names(bp)<-sapply(strsplit(names(bp),split="\\."),"[[",3)
-      # par(bg="#ebf0fb", col.axis="#3f4f78",col.lab="#3f4f78", cex=1.2) # a definir au niveau global
-      barplot(bp, names.arg=colnames(bp), col="#3f4f78")
-    }
-    if(input$variables == "parcelas"){
-      dataDepartamento <- data.frame(cuest$seccion_a.municipio[cuest$seccion_a.departamento == input$departamento],cuest$seccion_a.parcela[cuest$seccion_a.departamento == input$departamento])
-      # par(bg="#ebf0fb", col.axis="#3f4f78",col.lab="#3f4f78", cex=1.2, mar=c(8,4,4,4)) # a definir au niveau global
-      par(mar=c(8,4,4,4))
-      boxplot(as.numeric(dataDepartamento[,2]) ~ as.character(dataDepartamento[,1]), las=2,border="#3f4f78", frame=FALSE, xaxt='n',yaxt='n')
-      axis(1,at=1:length(unique(as.character(dataDepartamento[,1]))),labels=unique(as.character(dataDepartamento[,1])), lwd=0, las=2)
-      axis(2,ylim=seq(from=0, to=max(as.numeric(dataDepartamento[,2])),length.out = 4) ,lwd=1, col="#3f4f78")
+      barplot(bp, names.arg=colnames(bp), col="#3f4f78",main=paste0("Dpt: ",input$departamento,", Mun: ",input$municipio))
+      output$aso<-renderText({
+        paste0("Asociaciones: ",paste0(unique(as.character(dataMunicipio$seccion_a.asociacion[dataMunicipio$seccion_a.afiliaciones.asociacion==TRUE])),collapse=", "))
+      })
+      output$coo<-renderText({
+        paste0("Cooperativas: ",paste0(unique(as.character(dataMunicipio$seccion_a.cooperativa[dataMunicipio$seccion_a.afiliaciones.cooperativa==TRUE])),collapse=", "))
+      })
+      output$emp<-renderText({
+        paste0("Empresas: ",paste0(unique(as.character(dataMunicipio$seccion_a.empresa[dataMunicipio$seccion_a.afiliaciones.empresa==TRUE])),collapse=", "))
+      })
+      output$cam<-renderText({
+        paste0("Camaras: ",paste0(unique(as.character(dataMunicipio$seccion_a.camara[dataMunicipio$seccion_a.afiliaciones.camara==TRUE])),collapse=", "))
+      })
     }
   })
+  
+  ### plot: Terreno (30:35)  
+  output$dptTerreno <- renderUI({
+    deptList =  c("TODOS",unique(as.character(cuest$seccion_a.departamento)))
+    selectInput("dpt", "Departamento", deptList)
+  })
+  newPlot(plotName="Terreno",funPlot=function(){
+    cuestTerreno <- NULL
+    if(length(input$dpt)>0 && input$dpt=="TODOS"){
+      cuestTerreno <- cuest
+      index<-cuestTerreno$seccion_a.departamento
+    }
+    if(length(input$dpt)>0 && input$dpt!="TODOS"){
+      cuestTerreno <- cuest[cuest$seccion_a.departamento == input$dpt,]
+      index<-cuestTerreno$seccion_a.municipio
+    }
+    cuestTerreno[,c(31,34,35)][cuestTerreno[,30]=="tarea",]<-cuestTerreno[,c(31,34,35)][cuestTerreno[,30]=="tarea",]*0.06288
+    
+    if(!is.null(cuestTerreno)){
+      xl<-length(unique(index))
+      layout(matrix(c(1:xl,rep((xl+1),4*xl)),byrow=TRUE,ncol=xl))
+      lapply(unique(index),function(nm){
+        par(mar=c(0,4,1,0),cex=1.2)
+        barplot(c(sum(cuestTerreno[,32][index==nm],na.rm=TRUE),sum(cuestTerreno[,33][index==nm],na.rm=TRUE)),col="#3f4f78")
+        text(0.7,0,"Propio", srt=90, pos=3,offset = 2)
+        text(1.9,0,"Alquilado", srt=90, pos=3,offset = 2)
+      })
+      par(mar=c(8,4,3,0),cex=1.2)
+      boxplot(cuestTerreno[,31]~as.character(index), log="y", border="#3f4f78", frame=FALSE, yaxt='n',main=paste0("Dpt: ",input$dpt),ylab="Log(ha)",las=2)
+      axis(2,at=round(seq(from=0, to=max(cuestTerreno[,31],na.rm=TRUE),length.out = 10)),las=2)
+      layout(1)
+    }
+  },xheight=800)
+  
+  ### plot: Produccion (37:38)
+  output$dptProd <- renderUI({
+    deptList =  c("TODOS",unique(as.character(cuest$seccion_a.departamento)))
+    selectInput("dptP", "Departamento", deptList)
+  })
+  newPlot(plotName="Prod",funPlot=function(){
+    cuestProd <- NULL
+    if(length(input$dptP)>0 && input$dptP=="TODOS"){
+      cuestProd <- cuest
+      index<-as.character(cuestProd$seccion_a.departamento)
+    }
+    if(length(input$dptP)>0 && input$dptP!="TODOS"){
+      cuestProd <- cuest[cuest$seccion_a.departamento == input$dptP,]
+      index<-as.character(cuestProd$seccion_a.municipio)
+    }
+    if(!is.null(cuestProd)){
+      cuestProd[,37]<-factor(cuestProd[,37],levels=c("FALSE","TRUE"))
+      sumProd<-table(cuestProd[,37],index)
+      par(mar=c(8,4,4,4))
+      barplot(sumProd,beside=TRUE,col=c(grey(0.8),"#3f4f78"),las=2,main=paste0("Dpt: ",input$dptP))
+      legend("topright",legend=c("convencional","organico"),fill=c(grey(0.8),"#3f4f78"))
+    }
+  })
+  
+  ### plot: Parcelas (36)
+  newPlot(plotName="Parcelas",funPlot=function(){
+    mycolor <- rgb(input$RParcelas,input$GParcelas,input$BParcelas,maxColorValue = 255)
+    boxplot(cuest[,36]~cuest$seccion_a.departamento,xlab="",ylab="Numero de parcelas", log="y", border="#3f4f78", frame=FALSE,col=mycolor,main="Numero de parcelas")
+  })
+  
+  ### plot: Variedades (56, 80, 104, 154, 171, 188)
+  splitVar<-split(cuest[,c(56,80,103,154,188)],cuest[,4])
+  listVar<-lapply(splitVar,function(i){
+    ii<-unlist(i)
+    ii<-factor(ii,levels=unique(unlist(cuest[,c(56,80,104,154,188)])))
+    tvar<-table(ii)
+  })
+  bpVar<-do.call(rbind, listVar)
+  bpVarPerCent<-sapply(1:nrow(bpVar),function(i){bpVar[i,]/sum(bpVar[i,],na.rm=TRUE)*100})
+  
+  newPlot(plotName="Var",funPlot=function(){
+    mycolor1 <- rgb(abs(input$RVar-255),input$GVar,input$BVar,maxColorValue = 255)
+    mycolor2 <- rgb(input$RVar,input$GVar,input$BVar,maxColorValue = 255)
+    mycolor3 <- rgb(input$RVar,input$GVar,abs(input$BVar-255),maxColorValue = 255)
+    par(mar=c(16,4,4,4))
+    barplot(bpVar,las=2,ylab="Num. de agricultores",main="",col=c(mycolor1,mycolor2,mycolor3))
+    legend("topright",legend=c("La Paz","Oruro","Potosi"),fill=c(mycolor1,mycolor2,mycolor3))
+  })
+  newPlot(plotName="Var1",funPlot=function(){
+    mycolor <- rgb(input$RVar1,input$GVar1,input$BVar1,maxColorValue = 255)
+    par(mar=c(16,4,4,4))
+    barplot(bpVarPerCent[,1],las=2,ylab="%",main="La Paz",col=mycolor)
+  })
+  newPlot(plotName="Var2",funPlot=function(){
+    mycolor <- rgb(input$RVar2,input$GVar2,input$BVar2,maxColorValue = 255)
+    par(mar=c(16,4,4,4))
+    barplot(bpVarPerCent[,2],las=2,ylab="%",main="Oruro",col=mycolor)
+  })
+  newPlot(plotName="Var3",funPlot=function(){
+    mycolor <- rgb(input$RVar3,input$GVar3,input$BVar3,maxColorValue = 255)
+    par(mar=c(16,4,4,4))
+    barplot(bpVarPerCent[,3],las=2,ylab="%",main="Potosi",col=mycolor)
+  })
+
   
 })
