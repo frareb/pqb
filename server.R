@@ -182,6 +182,15 @@ shinyServer(function(input, output) {
     par(mar=c(16,4,4,4))
     barplot(bpVarPerCent[,3],las=2,ylab="%",main="Potosi",col=mycolor)
   })
-
   
+  ### siembra 
+  splitDate<-split(cuest[,c(58,82,106,139,156)],cuest[,4])
+  i1<-unlist(splitDate[[1]])
+  i2<-unlist(splitDate[[2]])
+  i3<-unlist(splitDate[[3]])
+  newHist(plotName="Fecha de siembra - La Paz",dataset=as.Date(i1,format="%Y-%m-%d"),isBins=TRUE,isDate=TRUE,isRGB=TRUE,isDensity=FALSE,isDownload=TRUE)
+  newHist(plotName="Fecha de siembra - Oruro",dataset=as.Date(i2,format="%Y-%m-%d"),isBins=TRUE,isDate=TRUE,isRGB=TRUE,isDensity=FALSE,isDownload=TRUE)
+  newHist(plotName="Fecha de siembra - Potosi",dataset=as.Date(i3,format="%Y-%m-%d"),isBins=TRUE,isDate=TRUE,isRGB=TRUE,isDensity=FALSE,isDownload=TRUE)
+  newHist(plotName="Fecha de siembra - Bolivia (2015)",dataset=as.Date(unlist(cuest[,c(58,82,106,139,156)]),format="%Y-%m-%d"),isBins=TRUE,isDate=TRUE,isRGB=TRUE,isDensity=FALSE,isDownload=TRUE)
+  # hist(as.Date(unlist(cuest[,c(58,82,106,139,156)]),format="%Y-%m-%d"),breaks="weeks",las=2)
 })
