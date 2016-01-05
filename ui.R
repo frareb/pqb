@@ -63,31 +63,99 @@ shinyUI(fluidPage(
                  sliderInput("myB_sexo","Color B:", min = 0, max = 255, value = 50))
               ),
               dispNewPlot("Sexo",colWidth=4),
-              # column(4,plotOutput("plotSexo"),downloadButton('downloadPlotSexo','Descargar')),
               dispNewPlot("SexoEdad",colWidth=5)
-              # column(5,plotOutput("plotSexoEdad"),downloadButton('downloadPlotSexoEdad','Descargar'))
             )
          ),
          tabPanel("Smartphone",
            fluidRow(
-             dispNewPlot("Smart",colWidth=6),
-             dispNewPlot("SmartEdad",colWidth=6)
-             # column(6,plotOutput("plotSmartEdad"),downloadButton('downloadPlotSmartEdad','Descargar'))
+             column(3,wellPanel("Opciones del grafico:",
+                sliderInput("RSmart","Color R:", min = 0, max = 255, value = 50),
+                sliderInput("GSmart","Color G:", min = 0, max = 255, value = 50),
+                sliderInput("BSmart","Color B:", min = 0, max = 255, value = 50))
+             ),
+             dispNewPlot("Smart",colWidth=4),
+             dispNewPlot("SmartEdad",colWidth=5)
            )
             
          )
       )
     ),
     tabPanel("Sistema productivo",
-      fluidRow(
-        column(3,
-           radioButtons("variables", "Variables", list("Afiliacion"="afiliacion","N° parcelas"="parcelas")),
-           uiOutput("reacDepartamento"),
-           conditionalPanel(condition = "input.variables == 'afiliacion'",uiOutput("reacMunicipio"))
+      tabsetPanel(
+        tabPanel("Afiliacion",
+          h2("Afiliacion"),
+          fluidRow(
+            column(3,
+                wellPanel(uiOutput("reacDepartamento"), uiOutput("reacMunicipio"))
+             ),
+            dispNewPlot("Afiliacion",colWidth=9)
+          ),
+            verbatimTextOutput("aso"),
+            verbatimTextOutput("coo"),
+            verbatimTextOutput("emp"),
+            verbatimTextOutput("cam")
+        ),
+        tabPanel("Terreno",
+           h2("Numero de parcelas"),
+           fluidRow(
+             column(3,wellPanel("Opciones del grafico:",
+              sliderInput("RParcelas","Color R:", min = 0, max = 255, value = 255),
+              sliderInput("GParcelas","Color G:", min = 0, max = 255, value = 255),
+              sliderInput("BParcelas","Color B:", min = 0, max = 255, value = 255))
+             ),
+             dispNewPlot("Parcelas",colWidth=9)
+           ),
+           verbatimTextOutput(NULL),
+           h2("Tamaño y propiedad del terreno"),
+           fluidRow(
+             column(3,wellPanel(uiOutput("dptTerreno"))),
+             dispNewPlot("Terreno",colWidth=9,reverse=TRUE)
+           )
+        ),
+        tabPanel("Produccion",
+          h2("Produccion"),
+           fluidRow(
+             column(3,wellPanel(uiOutput("dptProd"))),
+             dispNewPlot("Prod",colWidth=9)
+           )
+        ),
+        tabPanel("Variedades",
+         h2("Variedades"),
+         fluidRow(
+           column(3,wellPanel("Opciones del grafico:",
+                              sliderInput("RVar","Color R:", min = 0, max = 255, value = 0),
+                              sliderInput("GVar","Color G:", min = 0, max = 255, value = 150),
+                              sliderInput("BVar","Color B:", min = 0, max = 255, value = 200))
+           ),
+           dispNewPlot("Var",colWidth=9)
          ),
-        column(9,plotOutput("barPlotAfiliacion"))
+         fluidRow(
+           column(3,wellPanel("Opciones del grafico:",
+              sliderInput("RVar1","Color R:", min = 0, max = 255, value = 150),
+              sliderInput("GVar1","Color G:", min = 0, max = 255, value = 150),
+              sliderInput("BVar1","Color B:", min = 0, max = 255, value = 200))
+           ),
+           dispNewPlot("Var1",colWidth=9)
+         ),
+         fluidRow(
+           column(3,wellPanel("Opciones del grafico:",
+                              sliderInput("RVar2","Color R:", min = 0, max = 255, value = 150),
+                              sliderInput("GVar2","Color G:", min = 0, max = 255, value = 150),
+                              sliderInput("BVar2","Color B:", min = 0, max = 255, value = 200))
+           ),
+           dispNewPlot("Var2",colWidth=9)
+         ),
+         fluidRow(
+           column(3,wellPanel("Opciones del grafico:",
+                              sliderInput("RVar3","Color R:", min = 0, max = 255, value = 150),
+                              sliderInput("GVar3","Color G:", min = 0, max = 255, value = 150),
+                              sliderInput("BVar3","Color B:", min = 0, max = 255, value = 200))
+           ),
+           dispNewPlot("Var3",colWidth=9)
+         )
+        )
       )
     ),
-    tabPanel("Variedades")
+    tabPanel("Mapas")
   )
 ))
