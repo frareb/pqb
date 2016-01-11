@@ -1,21 +1,22 @@
-newPlotHist<-function(plotName,dataset,isBreaks=TRUE,isRGB=TRUE,isXYlab=TRUE,isMain=TRUE,isDensity=TRUE,isDownload=TRUE,...){
+newPlotGeneric<-function(type,plotName,dataset,isBreaks=FALSE,isRGB=FALSE,isDensity=FALSE,isDownload=FALSE,...){
   plotInputName<-paste0("plotInput",plotName)
   plotOutputName<-paste0("plot",plotName)
   if(isBreaks==TRUE){
     wgbreaksName<-paste0("breaks",plotName)
   }
   if(isRGB==TRUE){
-    wgRName<-paste0("R",plotName)
-    wgGName<-paste0("G",plotName)
-    wgBName<-paste0("B",plotName)
+    # wgRName<-paste0("R",plotName)
+    # wgGName<-paste0("G",plotName)
+    # wgBName<-paste0("B",plotName)
+    wgColName<-paste0("col",plotName)
   }
-  if(isXYlab==TRUE){
-    wgxlabName<-paste0("xlab",plotName)
-    wgylabName<-paste0("ylab",plotName)
-  }
-  if(isMain==TRUE){
-    wgMainName<-paste0("main",plotName)
-  }
+#   if(isXYlab==TRUE){
+#     wgxlabName<-paste0("xlab",plotName)
+#     wgylabName<-paste0("ylab",plotName)
+#   }
+#   if(isMain==TRUE){
+#     wgMainName<-paste0("main",plotName)
+#   }
   if(isDensity==TRUE){
     wgDensName<-paste0("dens",plotName)
   }
@@ -37,23 +38,24 @@ newPlotHist<-function(plotName,dataset,isBreaks=TRUE,isRGB=TRUE,isXYlab=TRUE,isM
     }else{bins<-"Sturges"}
     
     if(isRGB==TRUE){
-      mycolor <- rgb(input[[wgRName]],input[[wgGName]],input[[wgBName]],maxColorValue = 255)
+      # mycolor <- rgb(input[[wgRName]],input[[wgGName]],input[[wgBName]],maxColorValue = 255)
+      mycolor <- input[[wgColName]]
     } else {mycolor <- rgb(1,1,1)}
     
-    if(isXYlab==TRUE){
-      myxlab<-input[[wgxlabName]]
-      myylab<-input[[wgylabName]]
-    }else{
-      myxlab<-""
-      myylab<-"Frequency"
-    }
+#     if(isXYlab==TRUE){
+#       myxlab<-input[[wgxlabName]]
+#       myylab<-input[[wgylabName]]
+#     }else{
+#       myxlab<-""
+#       myylab<-"Frequency"
+#     }
     
-    if(isMain==TRUE){
-      mymain<-input[[wgMainName]]
-    }else{
-      mymain<-plotName
-    }
-
+#     if(isMain==TRUE){
+#       mymain<-input[[wgMainName]]
+#     }else{
+#       mymain<-plotName
+#     }
+    
     if(isDensity==TRUE){
       if(is.numeric(dataset)){
         dens <- density(dataset)
@@ -64,8 +66,18 @@ newPlotHist<-function(plotName,dataset,isBreaks=TRUE,isRGB=TRUE,isXYlab=TRUE,isM
       }
     }
     
-    hist(dataset,breaks=bins,freq=FALSE,col=mycolor,xlab=myxlab,ylab=myylab,main=mymain,...)
-    if(isDensity==TRUE){if(input[[wgDensName]]==TRUE){points(dens,type='l',lwd=2)}}
+    if(type=="hist"){
+      hist(dataset,breaks=bins,freq=FALSE,col=mycolor,...)
+      if(isDensity==TRUE){if(input[[wgDensName]]==TRUE){points(dens,type='l',lwd=2)}}
+    } else {
+      if(type=="barplot"){
+        barplot(dataset,col=mycolor,...)
+      } else {
+        if(type=="scatterplot"){
+          plot(dataset[[1]]~dataset[[2]],...)
+        }
+      }
+    }
   })
   output[[plotOutputName]]<-renderPlot({ get(plotInputName)() })
   if(isDownload==TRUE){
@@ -85,36 +97,215 @@ newPlotHist<-function(plotName,dataset,isBreaks=TRUE,isRGB=TRUE,isXYlab=TRUE,isM
         dev.off()
       }
     )
-    
   }
+  
 }
 
+newPlotHist<-function(...){
+  newPlotGeneric(type="hist",...)
+}
 
-# if(isBreaks==TRUE){sliderInput(paste0("breaks",plotName), binsTitle, min = 1, max = 50, value = 30)},
-dispNewPlotHist<-function(plotName,isBreaks=TRUE,isRGB=TRUE,isXYlab=TRUE,isMain=TRUE,isDensity=TRUE,isDownload=TRUE,rTitle="R:",gTitle="G:",bTitle="B:"){
+newPlotBarplot<-function(...){
+  newPlotGeneric(type="barplot",...)
+}
+
+newPlotScatterplot<-function(...){
+  newPlotGeneric(type="scatterplot",...)
+}
+
+dispNewPlotGeneric<-function(plotName,isBreaks=FALSE,isRGB=FALSE,isXYlab=FALSE,isMain=FALSE,isDensity=FALSE,isDownload=FALSE){
   return(fluidRow(
     column(3,wellPanel(
-      if(isRGB==TRUE){sliderInput(paste0("R",plotName),rTitle, min = 0, max = 255, value = 0)},
-      if(isRGB==TRUE){sliderInput(paste0("G",plotName),gTitle, min = 0, max = 255, value = 150)},
-      if(isRGB==TRUE){sliderInput(paste0("B",plotName),bTitle, min = 0, max = 255, value = 55)},
-      if(isBreaks==TRUE){sliderInput(paste0("breaks",plotName),"bins", min = 1, max = 50, value = 30)}
+      # if(isRGB==TRUE){sliderInput(paste0("R",plotName),"R", min = 0, max = 255, value = 0)},
+      # if(isRGB==TRUE){sliderInput(paste0("G",plotName),"G", min = 0, max = 255, value = 150)},
+      # if(isRGB==TRUE){sliderInput(paste0("B",plotName),"B", min = 0, max = 255, value = 55)},
+      if(isRGB==TRUE){selectInput(paste0("col",plotName),"Color:",choices=colors(),selected="lightblue")},
+      if(isBreaks==TRUE){sliderInput(paste0("breaks",plotName),"bins", min = 1, max = 50, value = 30)},
+      if(isDensity==TRUE){checkboxInput(paste0("dens",plotName),"density",value=TRUE)}#,
+      # if(isXYlab==TRUE){textInput(paste0("xlab",plotName),"xlab",value=plotName)},
+      # if(isXYlab==TRUE){textInput(paste0("ylab",plotName),"ylab",value="Frequency")},
+      # if(isMain==TRUE){textInput(paste0("main",plotName),"main",value=plotName)}
       )
     ),
     column(
-      6,plotOutput(paste0("plot",plotName)),
+      9,plotOutput(paste0("plot",plotName)),
       if(isDownload==TRUE){fluidRow(
         column(3,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
         column(3,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
         column(3,downloadButton(paste0("downloadPlotPNG",plotName),"PNG")),
         column(3,downloadButton(paste0("downloadPlotPDF",plotName),"PDF"))
       )}
-    ),
-    column(3,wellPanel(
-      if(isXYlab==TRUE){textInput(paste0("xlab",plotName),"xlab",value=plotName)},
-      if(isXYlab==TRUE){textInput(paste0("ylab",plotName),"ylab",value="Frequency")},
-      if(isMain==TRUE){textInput(paste0("main",plotName),"main",value=plotName)},
-      if(isDensity==TRUE){checkboxInput(paste0("dens",plotName),"density",value=TRUE)}
-      )
     )
   ))
+}
+
+
+
+
+### OLD FUNCTIONS
+
+
+#' Make a simple plot in shiny-server.
+#' 
+#' \code{newPlot} allows to build a plot in shiny with a download button for PNG export.
+#' @param plotName The name of the plot.
+#' @param funPlot A function which contain the code to build the plot, see examples.
+#' @param xheight Height of the plot in pixels.
+#' @return NULL.
+#' @examples
+#' \dontrun{
+#' newPlot(plotName="myNewPlot",funPlotfunction(){plot(1)},mwidth=800,mheight=600)
+#' }
+#' @details \code{newPlot} computes a plot input name starting with "plotInput"
+#'   with the name of the plot as a suffix, a plot output name starting with 
+#'   "plot" with the name of the plot as a suffix, a download button name 
+#'   starting with "downloadPlot" with the name of the plot as a suffix, and
+#'   a PNG file name with the same name as the \code{plotName}. These names
+#'   can later be used in the ui file to organize the layout.
+#'   The example above will create a simple plot \code{plot(1)} with 
+#'   plotInputmyNewPlot as plot input name,
+#'   plotmyNewPlot as plot output name,
+#'   downloadPlotmyNewPlot as download button name, and
+#'   myNewPlot.png as plot export name.
+#'   The counterpart in ui file could look like the following:
+#'   \code{column(4,plotOutput("plotmyNewPlot"),downloadButton('downloadPlotmyNewPlot','PNG'))}.
+# newPlot<-function(plotName,funPlot){
+#   plotInputName<-paste0("plotInput",plotName)
+#   plotOutputName<-paste0("plot",plotName)
+#   buttonDownloadName<-paste0("downloadPlot",plotName)
+#   pngName<-paste0(plotName,".png")
+#   assign(plotInputName,funPlot)
+#   output[[get('plotOutputName')]]<-renderPlot({ get(get('plotInputName'))() })
+#   output[[get('buttonDownloadName')]]<-downloadHandler(
+#     filename = function(){
+#       pngName
+#     },
+#     content = function(file){
+#       png(file,width=mwidth,height=mheight)
+#       get(get('plotInputName'))()
+#       dev.off()
+#     }
+#   )
+# }
+newPlot<-function(plotName,funPlot,xheight=400){
+  plotInputName<-paste0("plotInput",plotName)
+  plotOutputName<-paste0("plot",plotName)
+  buttonDownloadName<-paste0("downloadPlot",plotName)
+  pngName<-paste0(plotName,".png")
+  iwidth<-paste0("width",plotName)
+  iheight<-paste0("height",plotName)
+  assign(plotInputName,funPlot)
+  output[[get('plotOutputName')]]<-renderPlot({ get(get('plotInputName'))() }, height=xheight)
+  output[[get('buttonDownloadName')]]<-downloadHandler(
+    filename = function(){
+      pngName
+    },
+    content = function(file){
+      png(file,width=as.integer(input[[get('iwidth')]]),height=as.integer(input[[get('iheight')]]) )
+      get(get('plotInputName'))()
+      dev.off()
+    }
+  )
+}
+
+#' Make an histogram in shiny-server.
+#' 
+#' \code{newHist} allows to build an histogram in shiny.
+#' @param plotName The name of the plot.
+#' @param dataset The dataset for the histogram.
+#' @param isBins A logical to specify if number of breaks is user-defined.
+#' @param isRGB A logical to specify if colors are user-defined.
+#' @param isDensity A logical to specify if density should be drawn.
+#' @param isDownload A logical to specify if export to PNG option should be available.
+#' @return NULL.
+#' @examples
+#' \dontrun{
+#' newHist(plotName="myNewPlot",dataset=rnorm(100,mean=0,sd=1),isBins=FALSE,isRGB=FALSE,isDensity=TRUE,isDownload=FALSE,mwidth=800,mheight=600)
+#' }
+newHist<-function(plotName,dataset,isBins=TRUE,isDate=FALSE,isRGB=TRUE,isDensity=TRUE,isDownload=TRUE){
+  plotInputName<-paste0("plotInput",plotName)
+  plotOutputName<-paste0("plot",plotName)
+  if(isDownload==TRUE){
+    buttonDownloadName<-paste0("downloadPlot",plotName)
+    pngName<-paste0(plotName,".png")
+    iwidth<-paste0("width",plotName)
+    iheight<-paste0("height",plotName)
+  }
+  assign(plotInputName,function(){
+    if(isBins==TRUE){
+      if(isDate==TRUE){
+        bins <- "weeks"
+      }else{
+        bins <- seq(as.integer(min(dataset,na.rm=TRUE)), as.integer(max(dataset,na.rm=TRUE)),length.out = input[[paste0(plotName,"bins")]] + 1)
+      }
+    }else{bins<-"Sturges"}
+    if(isRGB==TRUE){
+      mycolor <- rgb(input[[paste0("R",plotName)]],input[[paste0("G",plotName)]],input[[paste0("B",plotName)]],maxColorValue = 255)
+    } else {mycolor <- 0}
+    hist(dataset,breaks=bins,freq=FALSE,col=mycolor,main=plotName)
+    if(isDensity==TRUE){points(density(dataset),type='l',lwd=2)}
+  })
+  output[[get('plotOutputName')]]<-renderPlot({ get(get('plotInputName'))() })
+  if(isDownload==TRUE){
+    output[[get('buttonDownloadName')]]<-downloadHandler(
+      filename = function(){pngName},
+      content = function(file){
+        png(file,width=as.integer(input[[get('iwidth')]]),height=as.integer(input[[get('iheight')]]))
+        get(get('plotInputName'))()
+        dev.off()
+      }
+    )
+  }
+}
+
+
+#' Make an histogram in shiny-ui.
+#' 
+#' \code{dispNewHist} allows to display an histogram in shiny within a \code{fluidPage} 
+#'   with some basic options on the right panel.
+dispNewHist<-function(plotName,isBins=TRUE,isRGB=TRUE,isDownload=TRUE,optColWidth=3,plotColWidth=9,mtitle="",binsTitle="Number of bars",rTitle="R:",gTitle="G:",bTitle="B:",downloadTitle="Download"){
+  return(fluidRow(
+    column(optColWidth,wellPanel(mtitle,
+                                 if(isBins==TRUE){sliderInput(paste0(plotName,"bins"), binsTitle, min = 1, max = 50, value = 30)},
+                                 if(isRGB==TRUE){sliderInput(paste0("R",plotName),rTitle, min = 0, max = 255, value = 0)},
+                                 if(isRGB==TRUE){sliderInput(paste0("G",plotName),gTitle, min = 0, max = 255, value = 150)},
+                                 if(isRGB==TRUE){sliderInput(paste0("B",plotName),bTitle, min = 0, max = 255, value = 55)}
+    )
+    ),
+    column(plotColWidth,plotOutput(paste0("plot",plotName)),
+           if(isDownload==TRUE){
+             # downloadButton(paste0("downloadPlot",plotName),downloadTitle)
+             fluidRow(
+               column(4,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
+               column(4,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
+               column(4,downloadButton(paste0("downloadPlot",plotName),"Desc."))
+             )
+           })
+  ))
+}
+
+#' Make a plot in shiny-ui.
+#' 
+#' \code{dispNewPlot} allows to display an histogram in shiny within a \code{fluidRow}
+#'   followed by two numerical inputs for width and height and a download button.
+dispNewPlot<-function(plotName,colWidth=6,reverse=FALSE){
+  return(
+    if(reverse==FALSE){
+      column(colWidth,plotOutput(paste0("plot",plotName)),
+             fluidRow(
+               column(4,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
+               column(4,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
+               column(4,downloadButton(paste0("downloadPlot",plotName),"Desc."))
+             ))
+    } else {
+      column(colWidth,
+             fluidRow(
+               column(4,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
+               column(4,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
+               column(4,downloadButton(paste0("downloadPlot",plotName),"Desc."))
+             ),
+             plotOutput(paste0("plot",plotName))
+      )
+    }
+  )
 }
