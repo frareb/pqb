@@ -75,6 +75,14 @@ newPlotGeneric<-function(type,plotName,dataset,isBreaks=FALSE,isRGB=FALSE,isDens
       } else {
         if(type=="scatterplot"){
           plot(dataset[[1]]~dataset[[2]],...)
+        } else {
+          if(type=="boxplotF"){
+            boxplot(dataset[[1]]~dataset[[2]],col=mycolor,...)
+          } else {
+            if(type=="boxplot"){
+              boxplot(dataset,col=mycolor,...)
+            }
+          }
         }
       }
     }
@@ -111,6 +119,14 @@ newPlotBarplot<-function(...){
 
 newPlotScatterplot<-function(...){
   newPlotGeneric(type="scatterplot",...)
+}
+
+newPlotBoxplot<-function(...){
+  newPlotGeneric(type="boxplot",...)
+}
+
+newPlotBoxplotF<-function(...){
+  newPlotGeneric(type="boxplotF",...)
 }
 
 dispNewPlotGeneric<-function(plotName,isBreaks=FALSE,isRGB=FALSE,isXYlab=FALSE,isMain=FALSE,isDensity=FALSE,isDownload=FALSE){
