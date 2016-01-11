@@ -1,0 +1,21 @@
+### siembra 
+splitDate<-split(cuest[,c(58,82,106,139,156)],cuest[,4])
+i1<-unlist(splitDate[[1]])
+i2<-unlist(splitDate[[2]])
+i3<-unlist(splitDate[[3]])
+newHist(plotName="Fecha de siembra - La Paz",dataset=as.Date(i1,format="%Y-%m-%d"),isBins=TRUE,isDate=TRUE,isRGB=TRUE,isDensity=FALSE,isDownload=TRUE)
+newHist(plotName="Fecha de siembra - Oruro",dataset=as.Date(i2,format="%Y-%m-%d"),isBins=TRUE,isDate=TRUE,isRGB=TRUE,isDensity=FALSE,isDownload=TRUE)
+newHist(plotName="Fecha de siembra - Potosi",dataset=as.Date(i3,format="%Y-%m-%d"),isBins=TRUE,isDate=TRUE,isRGB=TRUE,isDensity=FALSE,isDownload=TRUE)
+newHist(plotName="Fecha de siembra - Bolivia (2015)",dataset=as.Date(unlist(cuest[,c(58,82,106,139,156)]),format="%Y-%m-%d"),isBins=TRUE,isDate=TRUE,isRGB=TRUE,isDensity=FALSE,isDownload=TRUE)
+# hist(as.Date(unlist(cuest[,c(58,82,106,139,156)]),format="%Y-%m-%d"),breaks="weeks",las=2)
+
+newPlot(plotName="Fech",funPlot=function(){
+  mycolor1 <- rgb(abs(input$RFech-255),input$GFech,input$BFech,maxColorValue = 255)
+  mycolor2 <- rgb(input$RFech,input$GFech,input$BFech,maxColorValue = 255)
+  mycolor3 <- rgb(input$RFech,input$GFech,abs(input$BFech-255),maxColorValue = 255)
+  hist(as.Date(unlist(cuest[,c(58,82,106,139,156)]),format="%Y-%m-%d"),breaks="weeks",las=2,ylim=c(0,0.08),main="Fecha de siembra por departamento",xlab="")
+  lines(density(as.numeric(as.Date(i1,format="%Y-%m-%d")),na.rm=TRUE,adjust=3),lwd=3,col=mycolor1)
+  lines(density(as.numeric(as.Date(i2,format="%Y-%m-%d")),na.rm=TRUE,adjust=3),lwd=3,col=mycolor2)
+  lines(density(as.numeric(as.Date(i3,format="%Y-%m-%d")),na.rm=TRUE,adjust=3),lwd=3,col=mycolor3)
+  legend("topright",legend=c("La Paz","Oruro","Potosi"),fill=c(mycolor1,mycolor2,mycolor3))
+})
