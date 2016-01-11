@@ -1,0 +1,9 @@
+getTab_sysP_produccion<-function(){
+  tabPanel("Produccion",
+           h2("Produccion"),
+           fluidRow(
+             column(3,wellPanel(uiOutput("dptProd"))),
+             dispNewPlot("Prod",colWidth=9)
+           )
+  )
+}
