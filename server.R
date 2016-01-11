@@ -1,5 +1,4 @@
 library(shiny)
-library(plotrix)
 
 archivo<-"data/cuestionarioquinuarjj-2016-01-04-18-03-29.csv"
 tipoDatos<-c("factor","factor","Date","factor","factor","factor","factor","factor",
@@ -13,21 +12,20 @@ cuest<-read.table(archivo,sep=',',header=TRUE,na="n/a",colClasses=tipoDatos,enco
 
 shinyServer(function(input, output, session) {
   
-  source("server_fun.R", local=TRUE) # old functions, I'm working on it...
   source("server_plot_fun.R", local=TRUE) # new functions
   
-  source("server_agri_perso.R")       # data about people (age, gender)
-  source("server_agri_smart.R")       # data about smartphone (yes/no, f(age))
-  source("server_agri_medioAmb.R")    # data about enviro. (altura, temp, prec)
-  source("server_sysP_afiliacion.R")  # data about afiliation
-  source("server_sysP_terreno.R")     # data about prprety and land use
-  source("server_sysP_produccion.R")  # data about sys. of prod.
-  source("server_sysP_variedades.R")  # data about varieties
-  source("server_sysP_semillas.R")    # data about seeds provenance
-  source("server_sysP_siembra.R")     # data about sowing
-  source("server_sysP_manejo.R")      # data about intrants
-  source("server_anal_mapasInit.R")   # simple map with points
-  source("server_anal_mapasNumVar.R")  # maps of num. of var.
-  source("server_anal_mapasMAxVar.R")  # maps of all varieties
+  source("server_agri_perso.R", local=TRUE)        # data about people (age, gender)
+  source("server_agri_smart.R", local=TRUE)        # data about smartphone (yes/no, f(age))
+  source("server_agri_medioAmb.R", local=TRUE)     # data about enviro. (altura, temp, prec)
+  source("server_sysP_afiliacion.R", local=TRUE)   # data about afiliation
+  source("server_sysP_terreno.R", local=TRUE)      # data about prprety and land use
+  source("server_sysP_produccion.R", local=TRUE)   # data about sys. of prod.
+  source("server_sysP_variedades.R", local=TRUE)   # data about varieties
+  source("server_sysP_semillas.R", local=TRUE)     # data about seeds provenance
+  source("server_sysP_siembra.R", local=TRUE)      # data about sowing
+  source("server_sysP_manejo.R", local=TRUE)       # data about intrants
+  source("server_anal_mapasInit.R", local=TRUE)    # simple map with points
+  source("server_anal_mapasNumVar.R", local=TRUE)  # maps of num. of var.
+  source("server_anal_mapasMAxVar.R", local=TRUE)  # maps of all varieties
   
 })
