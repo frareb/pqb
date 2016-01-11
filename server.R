@@ -11,9 +11,33 @@ tipoDatos<-c("factor","factor","Date","factor","factor","factor","factor","facto
              rep("character",265-38))
 cuest<-read.table(archivo,sep=',',header=TRUE,na="n/a",colClasses=tipoDatos,encoding="UTF-8")
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
   
-  source("server_fun.R", local=TRUE)
+  source("server_fun.R", local=TRUE) # old functions, I'm working on it...
+  source("server_plot_fun.R", local=TRUE) # new functions
+  
+  source("server_agri_perso.R")       # data about people (age, gender)
+  source("server_agri_smart.R")       # data about smartphone (yes/no, f(age))
+  source("server_agri_medioAmb.R")    # data about enviro. (altura, temp, prec)
+  source("server_sysP_afiliacion.R")  # data about afiliation
+  source("server_sysP_terreno.R")     # data about prprety and land use
+  source("server_sysP_produccion.R")  # data about sys. of prod.
+  source("server_sysP_variedades.R")  # data about varieties
+  source("server_sysP_semillas.R")    # data about seeds provenance
+  source("server_sysP_siembra.R")     # data about sowing
+  source("server_sysP_manejo.R")      # data about intrants
+  source("server_anal_mapasInit.R")   # simple map with points
+  source("server_anal_mapasNumVar.R")  # maps of num. of var.
+  source("server_anal_mapasMAxVar.R")  # maps of all varieties
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   ### plot: smartphone (15)
   newPlot(plotName="Smart",funPlot=function(){
@@ -26,25 +50,7 @@ shinyServer(function(input, output) {
     plot(cuest[,15]~cuest[,13],xlab="Edad",ylab="Smartphone")
   })
   
-  ### plot: Edad (13)
-  newHist(plotName="Edad",dataset=cuest[,13],isBins=TRUE,isRGB=TRUE,isDensity=TRUE,isDownload=TRUE)
-
-  ### plot: Sexo (12)
-  newPlot(plotName="Sexo",funPlot=function(){
-    mycolor <- rgb(input$myR_sexo,input$myG_sexo,input$myB_sexo,maxColorValue = 255)
-    barplot(table(cuest[,12]), col = mycolor, border = 'white',main=names(cuest)[12])
-  })
   
-  ### plot: Sexo ~ Edad (12;13)
-  newPlot(plotName="SexoEdad",funPlot=function(){
-    datos<-table(cuest[,13],cuest[,12])
-    xy.pop<-datos[,2]
-    xx.pop<-datos[,1]
-    agelabels<-names(datos[,2])
-    mcol<-color.gradient(c(0,0,0.5,1),c(0,0,0.5,1),c(1,1,0.5,1),length(datos[,2]))
-    fcol<-color.gradient(c(1,1,0.5,1),c(0.5,0.5,0.5,1),c(0.5,0.5,0.5,1),length(datos[,2]))
-    par(mar=pyramid.plot(xx.pop,xy.pop,lxcol=mcol,rxcol=fcol,gap=0.5,show.values=FALSE,labels=agelabels))
-  })
   
   ### plot: Afiliacion (16:20) + (21:24)
   output$reacDepartamento <- renderUI({
