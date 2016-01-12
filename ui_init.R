@@ -40,7 +40,8 @@ getTabInit<-function(){
             arcu, eget imperdiet purus varius ac. In hac habitasse platea dictumst. Proin elem
             entum fringilla dui. Ut vel scelerisque dui. Nunc hendrerit diam dui, vel pulvinar
             enim varius in.")
-             )
-           )
+               ,style = "background-image: url('main_inicio.png')"
+          )
+        )
   )
 }
