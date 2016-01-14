@@ -1,4 +1,4 @@
-newPlotGeneric<-function(type,plotName,dataset,isBreaks=FALSE,isRGB=FALSE,isDensity=FALSE,isDownload=FALSE,addMarBellow=4,addLegend=FALSE,...){
+newPlotGeneric_bak<-function(type,plotName,dataset,isBreaks=FALSE,isRGB=FALSE,isDensity=FALSE,isDownload=FALSE,addMarBellow=4,addLegend=FALSE,...){
   plotInputName<-paste0("plotInput",plotName)
   plotOutputName<-paste0("plot",plotName)
   if(isBreaks==TRUE){
@@ -169,6 +169,242 @@ newPlotGeneric<-function(type,plotName,dataset,isBreaks=FALSE,isRGB=FALSE,isDens
   
 }
 
+newPlotGeneric<-function(type,plotName,dataset,
+                         isBreaks=FALSE,isRGB=FALSE,isDensity=FALSE,isDownload=FALSE,
+                         addMarBellow=4,addLegend=FALSE,
+                         cond1=NULL,cond2=NULL,cond1Label="",cond2Label="",
+                         ...){
+  plotInputName<-paste0("plotInput",plotName)
+  plotOutputName<-paste0("plot",plotName)
+  if(isBreaks==TRUE){
+    wgbreaksName<-paste0("breaks",plotName)
+  }
+  if(isRGB==TRUE){
+    # wgRName<-paste0("R",plotName)
+    # wgGName<-paste0("G",plotName)
+    # wgBName<-paste0("B",plotName)
+    wgColName<-paste0("col",plotName)
+  }
+  #   if(isXYlab==TRUE){
+  #     wgxlabName<-paste0("xlab",plotName)
+  #     wgylabName<-paste0("ylab",plotName)
+  #   }
+  #   if(isMain==TRUE){
+  #     wgMainName<-paste0("main",plotName)
+  #   }
+  if(isDensity==TRUE){
+    wgDensName<-paste0("dens",plotName)
+  }
+  if(isDownload==TRUE){
+    wgDownPNGName<-paste0("downloadPlotPNG",plotName)
+    wgDownPDFName<-paste0("downloadPlotPDF",plotName)
+    pngName<-paste0(plotName,".png")
+    pdfName<-paste0(plotName,".pdf")
+    wgWidthName<-paste0("width",plotName)
+    wgHeightName<-paste0("height",plotName)
+  }
+  if(!is.null(cond1)){
+    wgCond1OutName<-paste0("cond1",plotName)
+    output[[paste0("cond1",plotName)]]<-renderUI({selectInput(wgCond1OutName, cond1Label, c("ALL",unique(as.character(cond1))))})
+  }
+  if(!is.null(cond2)){
+    wgCond2OutName<-paste0("cond2",plotName)
+    output[[paste0("cond2",plotName)]]<-renderUI({
+      if(length(input[[wgCond1OutName]]>0)){
+        selectInput(wgCond2OutName, cond2Label, c("ALL",unique(as.character(cond2[cond1==input[[wgCond1OutName]]]))))
+      }
+    })
+  }
+  
+  assign(plotInputName,function(){
+    
+    if(!is.null(cond1)){
+      datasetAlt<-NULL
+      if(length(input[[wgCond1OutName]])>0 && input[[wgCond1OutName]]=="ALL"){datasetAlt <- dataset} else {
+        if(length(input[[wgCond1OutName]])>0 && input[[wgCond1OutName]]!="ALL"){
+          if(is.null(cond2)){#!
+            datasetAlt <- dataset[cond1 == input[[wgCond1OutName]],]
+          } else {
+            if(input[[wgCond2OutName]]!="ALL"){
+              datasetAlt <- dataset[cond2 == input[[wgCond2OutName]],]
+            } else {
+              datasetAlt <- dataset[cond1 == input[[wgCond1OutName]],]
+            }
+          }
+        }
+      }
+      if(!is.null(datasetAlt)){
+        # dataset<-apply(datasetAlt,MARGIN=2,FUN=sum,na.rm=TRUE)
+        
+        ### test
+        if(class(datasetAlt)!="data.frame"){datasetAlt<-data.frame(datasetAlt)}
+        xx<-lapply(datasetAlt,FUN=table,useNA="always")
+        xxx<-sapply(xx,function(x){
+          if(!is.na(x['TRUE'])){
+            TRUEs<-x['TRUE']/sum(x,na.rm=TRUE)
+          }else{TRUEs<-0}
+          if(!is.na(x['FALSE'])){
+            FALSEs<-x['FALSE']/sum(x,na.rm=TRUE)
+          }else{FALSEs<-0}
+          return(rbind(TRUEs,FALSEs))
+        })
+        colnames(xxx)<-names(xx)
+        rownames(xxx)<-c("TRUE","FALSE")
+        dataset<-xxx
+        
+        
+        if(any(grepl("\\.",colnames(dataset))==TRUE)){
+          colnames(dataset)<-sapply(strsplit(colnames(dataset),split="\\."),"[[",length(strsplit(colnames(dataset),split="\\.")[[1]]))
+        }
+      }else{dataset<-0}
+    }
+    
+    if(isBreaks==TRUE){
+      if(is.numeric(dataset)){
+        bins <- seq(min(dataset,na.rm=TRUE), max(dataset,na.rm=TRUE),length.out = input[[wgbreaksName]] + 1)
+      }else{bins<-"Sturges"}
+    }else{bins<-"Sturges"}
+    
+    if(isRGB==TRUE){
+      # mycolor <- rgb(input[[wgRName]],input[[wgGName]],input[[wgBName]],maxColorValue = 255)
+      mycolor <- input[[wgColName]]
+    } else {mycolor <- rgb(1,1,1)}
+    
+    #     if(isXYlab==TRUE){
+    #       myxlab<-input[[wgxlabName]]
+    #       myylab<-input[[wgylabName]]
+    #     }else{
+    #       myxlab<-""
+    #       myylab<-"Frequency"
+    #     }
+    
+    #     if(isMain==TRUE){
+    #       mymain<-input[[wgMainName]]
+    #     }else{
+    #       mymain<-plotName
+    #     }
+    
+    if(isDensity==TRUE){
+      if(is.numeric(dataset)){
+        dens <- density(dataset)
+      }else{
+        if(is(dataset,"Date")){
+          dens <- density(as.numeric(dataset))
+        }
+      }
+    }
+    
+    if(type=="hist"){
+      hist(dataset,breaks=bins,freq=FALSE,col=mycolor,...)
+      if(isDensity==TRUE){if(input[[wgDensName]]==TRUE){points(dens,type='l',lwd=2)}}
+    } else {
+      if(type=="barplot"){
+        if(class(dataset)=="matrix" && nrow(dataset)>1){
+          rgbcol<-col2rgb(mycolor)
+          if(nrow(dataset)==2){
+            mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+            mycolors<-c(mycolor,mycolor2)
+            par(mar=c(addMarBellow,4,4,4))
+            barplot(dataset,col=mycolors,...)
+            if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
+          } else {
+            if(nrow(dataset)==3){
+              mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+              mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+              mycolors<-c(mycolor,mycolor2,mycolor3)
+              par(mar=c(addMarBellow,4,4,4))
+              barplot(dataset,col=mycolors,...)
+              if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
+            } else {
+              if(nrow(dataset)==4){
+                mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+                mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+                mycolor4<-rgb(rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
+                mycolors<-c(mycolor,mycolor2,mycolor3,mycolor4)
+                par(mar=c(addMarBellow,4,4,4))
+                barplot(dataset,col=mycolors,...)
+                if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
+              } else {
+                if(nrow(dataset)==5){
+                  mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+                  mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+                  mycolor4<-rgb(rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
+                  mycolor5<-rgb(255-rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+                  mycolors<-c(mycolor,mycolor2,mycolor3,mycolor4,mycolor5)
+                  par(mar=c(addMarBellow,4,4,4))
+                  barplot(dataset,col=mycolors,...)
+                  if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
+                } else {
+                  if(nrow(dataset)==6){
+                    mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+                    mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+                    mycolor4<-rgb(rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
+                    mycolor5<-rgb(255-rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+                    mycolor6<-rgb(255-rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
+                    mycolors<-c(mycolor,mycolor2,mycolor3,mycolor4,mycolor5,mycolor6)
+                    par(mar=c(addMarBellow,4,4,4))
+                    barplot(dataset,col=mycolors,...)
+                    if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
+                  } else {
+                    par(mar=c(addMarBellow,4,4,4))
+                    barplot(dataset,...)
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          mycolors<-mycolor
+          par(mar=c(addMarBellow,4,4,4))
+          barplot(dataset,col=mycolors,...)
+        }
+      } else {
+        if(type=="scatterplot"){
+          if(is.factor(dataset[[2]])){
+            rgbcol<-col2rgb(mycolor)
+            mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+            plot(dataset[[1]]~dataset[[2]],col=c(mycolor,mycolor2),...)
+          } else {
+            plot(dataset[[1]]~dataset[[2]],col=mycolor,...)
+          }
+        } else {
+          if(type=="boxplot"){
+            boxplot(dataset,col=mycolor,...)
+          } else {
+            
+          }
+        }
+      }
+    }
+  })
+  output[[plotOutputName]]<-renderPlot({ get(plotInputName)() })
+  if(isDownload==TRUE){
+    output[[wgDownPNGName]]<-downloadHandler(
+      filename = function(){pngName},
+      content = function(file){
+        png(file,width=as.integer(input[[wgWidthName]]),height=as.integer(input[[wgHeightName]]))
+        get(plotInputName)()
+        dev.off()
+      }
+    )
+    output[[wgDownPDFName]]<-downloadHandler(
+      filename = function(){pdfName},
+      content = function(file){
+        pdf(file,width=as.integer(input[[wgWidthName]])*7/800,height=as.integer(input[[wgHeightName]])*7/800)
+        get(plotInputName)()
+        dev.off()
+      }
+    )
+  }
+  
+}
+
+
+
+
+
+
+
 newPlotHist<-function(...){
   newPlotGeneric(type="hist",...)
 }
@@ -185,7 +421,7 @@ newPlotBoxplot<-function(...){
   newPlotGeneric(type="boxplot",...)
 }
 
-dispNewPlotGeneric<-function(plotName,isBreaks=FALSE,isRGB=FALSE,isXYlab=FALSE,isMain=FALSE,isDensity=FALSE,isDownload=FALSE){
+dispNewPlotGeneric<-function(plotName,isBreaks=FALSE,isRGB=FALSE,isDensity=FALSE,isDownload=FALSE,isCond1=FALSE,isCond2=FALSE){
   return(fluidRow(
     column(3,wellPanel(
       # if(isRGB==TRUE){sliderInput(paste0("R",plotName),"R", min = 0, max = 255, value = 0)},
@@ -193,7 +429,9 @@ dispNewPlotGeneric<-function(plotName,isBreaks=FALSE,isRGB=FALSE,isXYlab=FALSE,i
       # if(isRGB==TRUE){sliderInput(paste0("B",plotName),"B", min = 0, max = 255, value = 55)},
       if(isRGB==TRUE){selectInput(paste0("col",plotName),"Color:",choices=colors(),selected="lightblue")},
       if(isBreaks==TRUE){sliderInput(paste0("breaks",plotName),"bins", min = 1, max = 50, value = 30)},
-      if(isDensity==TRUE){checkboxInput(paste0("dens",plotName),"density",value=TRUE)}#,
+      if(isDensity==TRUE){checkboxInput(paste0("dens",plotName),"density",value=TRUE)},
+      if(isCond1==TRUE){uiOutput(paste0("cond1",plotName))},
+      if(isCond2==TRUE){uiOutput(paste0("cond2",plotName))}#,
       # if(isXYlab==TRUE){textInput(paste0("xlab",plotName),"xlab",value=plotName)},
       # if(isXYlab==TRUE){textInput(paste0("ylab",plotName),"ylab",value="Frequency")},
       # if(isMain==TRUE){textInput(paste0("main",plotName),"main",value=plotName)}
@@ -210,6 +448,10 @@ dispNewPlotGeneric<-function(plotName,isBreaks=FALSE,isRGB=FALSE,isXYlab=FALSE,i
     )
   ))
 }
+
+# newPlotGenericCond1<-function(type,plotName,dataset,cond1)
+# newPlotGenericCond2<-function(type,plotName,dataset,cond1,cond2)
+
 
 #' Make a simple plot in shiny-server.
 #' 
