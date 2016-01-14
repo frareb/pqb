@@ -1,4 +1,4 @@
-newPlotGeneric<-function(type,plotName,dataset,isBreaks=FALSE,isRGB=FALSE,isDensity=FALSE,isDownload=FALSE,...){
+newPlotGeneric<-function(type,plotName,dataset,isBreaks=FALSE,isRGB=FALSE,isDensity=FALSE,isDownload=FALSE,addMarBellow=4,addLegend=FALSE,...){
   plotInputName<-paste0("plotInput",plotName)
   plotOutputName<-paste0("plot",plotName)
   if(isBreaks==TRUE){
@@ -71,17 +71,77 @@ newPlotGeneric<-function(type,plotName,dataset,isBreaks=FALSE,isRGB=FALSE,isDens
       if(isDensity==TRUE){if(input[[wgDensName]]==TRUE){points(dens,type='l',lwd=2)}}
     } else {
       if(type=="barplot"){
-        barplot(dataset,col=mycolor,...)
+        if(class(dataset)=="matrix" && nrow(dataset)>1){
+          rgbcol<-col2rgb(mycolor)
+          if(nrow(dataset)==2){
+            mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+            par(mar=c(addMarBellow,4,4,4))
+            barplot(dataset,col=c(mycolor,mycolor2),...)
+          } else {
+            if(nrow(dataset)==3){
+              mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+              mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+              mycolors<-c(mycolor,mycolor2,mycolor3)
+              par(mar=c(addMarBellow,4,4,4))
+              barplot(dataset,col=mycolors,...)
+              if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
+            } else {
+              if(nrow(dataset)==4){
+                mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+                mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+                mycolor4<-rgb(rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
+                mycolors<-c(mycolor,mycolor2,mycolor3,mycolor4)
+                par(mar=c(addMarBellow,4,4,4))
+                barplot(dataset,col=mycolors,...)
+                if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
+              } else {
+                if(nrow(dataset)==5){
+                  mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+                  mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+                  mycolor4<-rgb(rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
+                  mycolor5<-rgb(255-rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+                  mycolors<-c(mycolor,mycolor2,mycolor3,mycolor4,mycolor5)
+                  par(mar=c(addMarBellow,4,4,4))
+                  barplot(dataset,col=mycolors,...)
+                  if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
+                } else {
+                  if(nrow(dataset)==6){
+                    mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+                    mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+                    mycolor4<-rgb(rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
+                    mycolor5<-rgb(255-rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+                    mycolor6<-rgb(255-rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
+                    mycolors<-c(mycolor,mycolor2,mycolor3,mycolor4,mycolor5,mycolor6)
+                    par(mar=c(addMarBellow,4,4,4))
+                    barplot(dataset,col=mycolors,...)
+                    if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
+                  } else {
+                    par(mar=c(addMarBellow,4,4,4))
+                    barplot(dataset,...)
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          mycolors<-mycolor
+          par(mar=c(addMarBellow,4,4,4))
+          barplot(dataset,col=mycolors,...)
+        }
       } else {
         if(type=="scatterplot"){
-          plot(dataset[[1]]~dataset[[2]],...)
-        } else {
-          if(type=="boxplotF"){
-            boxplot(dataset[[1]]~dataset[[2]],col=mycolor,...)
+          if(is.factor(dataset[[2]])){
+            rgbcol<-col2rgb(mycolor)
+            mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+            plot(dataset[[1]]~dataset[[2]],col=c(mycolor,mycolor2),...)
           } else {
-            if(type=="boxplot"){
-              boxplot(dataset,col=mycolor,...)
-            }
+            plot(dataset[[1]]~dataset[[2]],col=mycolor,...)
+          }
+        } else {
+          if(type=="boxplot"){
+            boxplot(dataset,col=mycolor,...)
+          } else {
+            
           }
         }
       }
@@ -125,10 +185,6 @@ newPlotBoxplot<-function(...){
   newPlotGeneric(type="boxplot",...)
 }
 
-newPlotBoxplotF<-function(...){
-  newPlotGeneric(type="boxplotF",...)
-}
-
 dispNewPlotGeneric<-function(plotName,isBreaks=FALSE,isRGB=FALSE,isXYlab=FALSE,isMain=FALSE,isDensity=FALSE,isDownload=FALSE){
   return(fluidRow(
     column(3,wellPanel(
@@ -154,12 +210,6 @@ dispNewPlotGeneric<-function(plotName,isBreaks=FALSE,isRGB=FALSE,isXYlab=FALSE,i
     )
   ))
 }
-
-
-
-
-### OLD FUNCTIONS
-
 
 #' Make a simple plot in shiny-server.
 #' 
@@ -223,6 +273,34 @@ newPlot<-function(plotName,funPlot,xheight=400){
     }
   )
 }
+
+#' Make a plot in shiny-ui.
+#' 
+#' \code{dispNewPlot} allows to display an histogram in shiny within a \code{fluidRow}
+#'   followed by two numerical inputs for width and height and a download button.
+dispNewPlot<-function(plotName,colWidth=6,reverse=FALSE){
+  return(
+    if(reverse==FALSE){
+      column(colWidth,plotOutput(paste0("plot",plotName)),
+             fluidRow(
+               column(4,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
+               column(4,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
+               column(4,downloadButton(paste0("downloadPlot",plotName),"Desc."))
+             ))
+    } else {
+      column(colWidth,
+             fluidRow(
+               column(4,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
+               column(4,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
+               column(4,downloadButton(paste0("downloadPlot",plotName),"Desc."))
+             ),
+             plotOutput(paste0("plot",plotName))
+      )
+    }
+  )
+}
+
+### OLD FUNCTIONS
 
 #' Make an histogram in shiny-server.
 #' 
@@ -300,28 +378,3 @@ dispNewHist<-function(plotName,isBins=TRUE,isRGB=TRUE,isDownload=TRUE,optColWidt
   ))
 }
 
-#' Make a plot in shiny-ui.
-#' 
-#' \code{dispNewPlot} allows to display an histogram in shiny within a \code{fluidRow}
-#'   followed by two numerical inputs for width and height and a download button.
-dispNewPlot<-function(plotName,colWidth=6,reverse=FALSE){
-  return(
-    if(reverse==FALSE){
-      column(colWidth,plotOutput(paste0("plot",plotName)),
-             fluidRow(
-               column(4,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
-               column(4,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
-               column(4,downloadButton(paste0("downloadPlot",plotName),"Desc."))
-             ))
-    } else {
-      column(colWidth,
-             fluidRow(
-               column(4,numericInput(inputId=paste0("width",plotName),label=NULL,value=800)),
-               column(4,numericInput(inputId=paste0("height",plotName),label=NULL,value=600)),
-               column(4,downloadButton(paste0("downloadPlot",plotName),"Desc."))
-             ),
-             plotOutput(paste0("plot",plotName))
-      )
-    }
-  )
-}
