@@ -2,5 +2,7 @@
 newPlotBarplot(plotName="Smart",dataset=table(cuest[,15]),isRGB=TRUE,isDownload=TRUE)
 
 ### plot smartphone ~ Edad (15;13)
-# newPlotScatterplot(plotName="SmartEdad",dataset=list(cuest[,15],cuest[,13]),isDownload=TRUE,xlab="Edad",ylab="Tiene smartphone?")
-newPlotBoxplotF(plotName="SmartEdad",dataset=list(cuest[,13],cuest[,15]),isRGB=TRUE,isDownload=TRUE,ylab="Edad")
+newPlotBoxplot(plotName="SmartEdad",dataset=cuest[,13]~cuest[,15],isRGB=TRUE,isDownload=TRUE,ylab="Edad")
+
+### plot smartphone ~ Sexo (15;12)
+newPlotScatterplot(plotName="SmartSexo",dataset=list(cuest[,12],cuest[,15]),isRGB=TRUE,isDownload=TRUE,ylab="Sexo",xlab="Smartphone")

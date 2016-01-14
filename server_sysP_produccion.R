@@ -1,4 +1,5 @@
 ### plot: Produccion (37:38)
+### faire la fonction spécifique pour simple entrée DPT (Francois)
 output$dptProd <- renderUI({
   deptList =  c("TODOS",unique(as.character(cuest$seccion_a.departamento)))
   selectInput("dptP", "Departamento", deptList)

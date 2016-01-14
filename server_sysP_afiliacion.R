@@ -1,4 +1,4 @@
-### plot: Afiliacion (16:20) + (21:24)
+### plot: Afiliacion (16:20) + (21:24) ### faire la fonction spécifique pour double entrée DPT + MUN (Francois)
 output$reacDepartamento <- renderUI({
   departamentoList =  c("TODOS",unique(as.character(cuest$seccion_a.departamento)))
   selectInput("departamento", "Departamento", departamentoList)

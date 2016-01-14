@@ -8,26 +8,7 @@ listVar<-lapply(splitVar,function(i){
 bpVar<-do.call(rbind, listVar)
 bpVarPerCent<-sapply(1:nrow(bpVar),function(i){bpVar[i,]/sum(bpVar[i,],na.rm=TRUE)*100})
 
-newPlot(plotName="Var",funPlot=function(){
-  mycolor1 <- rgb(abs(input$RVar-255),input$GVar,input$BVar,maxColorValue = 255)
-  mycolor2 <- rgb(input$RVar,input$GVar,input$BVar,maxColorValue = 255)
-  mycolor3 <- rgb(input$RVar,input$GVar,abs(input$BVar-255),maxColorValue = 255)
-  par(mar=c(16,4,4,4))
-  barplot(bpVar,las=2,ylab="Num. de agricultores",main="",col=c(mycolor1,mycolor2,mycolor3))
-  legend("topright",legend=c("La Paz","Oruro","Potosi"),fill=c(mycolor1,mycolor2,mycolor3))
-})
-newPlot(plotName="Var1",funPlot=function(){
-  mycolor <- rgb(input$RVar1,input$GVar1,input$BVar1,maxColorValue = 255)
-  par(mar=c(16,4,4,4))
-  barplot(bpVarPerCent[,1],las=2,ylab="%",main="La Paz",col=mycolor)
-})
-newPlot(plotName="Var2",funPlot=function(){
-  mycolor <- rgb(input$RVar2,input$GVar2,input$BVar2,maxColorValue = 255)
-  par(mar=c(16,4,4,4))
-  barplot(bpVarPerCent[,2],las=2,ylab="%",main="Oruro",col=mycolor)
-})
-newPlot(plotName="Var3",funPlot=function(){
-  mycolor <- rgb(input$RVar3,input$GVar3,input$BVar3,maxColorValue = 255)
-  par(mar=c(16,4,4,4))
-  barplot(bpVarPerCent[,3],las=2,ylab="%",main="Potosi",col=mycolor)
-})
+newPlotBarplot(plotName="Var",dataset=bpVar,isRGB=TRUE,isDownload=TRUE,las=2,ylab="Num. de agricultores",main="",addMarBellow=16,addLegend=TRUE)
+newPlotBarplot(plotName="Var1",dataset=bpVarPerCent[,1],isRGB=TRUE,isDownload=TRUE,las=2,ylab="%",main="La Paz",addMarBellow=16)
+newPlotBarplot(plotName="Var2",dataset=bpVarPerCent[,2],isRGB=TRUE,isDownload=TRUE,las=2,ylab="%",main="Oruro",addMarBellow=16)
+newPlotBarplot(plotName="Var3",dataset=bpVarPerCent[,3],isRGB=TRUE,isDownload=TRUE,las=2,ylab="%",main="Potosi",addMarBellow=16)

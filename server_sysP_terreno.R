@@ -1,10 +1,9 @@
 ### plot: Parcelas (36)
-newPlot(plotName="Parcelas",funPlot=function(){
-  mycolor <- rgb(input$RParcelas,input$GParcelas,input$BParcelas,maxColorValue = 255)
-  boxplot(cuest[,36]~cuest$seccion_a.departamento,xlab="",ylab="Numero de parcelas", log="y", border="#3f4f78", frame=FALSE,col=mycolor,main="Numero de parcelas")
-})
+newPlotBoxplot(plotName="Parcelas",dataset=cuest[,36]~cuest$seccion_a.departamento,isRGB=TRUE,isDownload=TRUE,ylab="Numero de parcelas",log="y")
 
-### plot: Terreno (30:35)  
+### plot: Terreno (30:35)
+### a refaire depuis le debut en plusieurs graphiques simples
+### faire la fonction spécifique pour simple entrée DPT (Francois)
 output$dptTerreno <- renderUI({
   deptList =  c("TODOS",unique(as.character(cuest$seccion_a.departamento)))
   selectInput("dpt", "Departamento", deptList)
