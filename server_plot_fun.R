@@ -235,26 +235,40 @@ newPlotGeneric<-function(type,plotName,dataset,
       }
       if(!is.null(datasetAlt)){
         # dataset<-apply(datasetAlt,MARGIN=2,FUN=sum,na.rm=TRUE)
+        if(any(datasetAlt=="True") || any(datasetAlt=="False")){
+          xx<-sapply(1:ncol(datasetAlt),function(x){
+            datasetAlt[,x][datasetAlt[,x]=="True"]<-TRUE
+            return(datasetAlt[,x])
+            })
+          xx<-sapply(1:ncol(xx),function(x){
+            xx[,x][xx[,x]=="False"]<-FALSE
+            return(xx[,x])
+          })
+          colnames(xx)<-names(datasetAlt)
+          datasetAlt<-xx
+        }
         
-        ### test
         if(class(datasetAlt)!="data.frame"){datasetAlt<-data.frame(datasetAlt)}
+        
         xx<-lapply(datasetAlt,FUN=table,useNA="always")
         xxx<-sapply(xx,function(x){
           if(!is.na(x['TRUE'])){
             TRUEs<-x['TRUE']/sum(x,na.rm=TRUE)
           }else{TRUEs<-0}
-          if(!is.na(x['FALSE'])){
-            FALSEs<-x['FALSE']/sum(x,na.rm=TRUE)
-          }else{FALSEs<-0}
-          return(rbind(TRUEs,FALSEs))
+#           if(!is.na(x['FALSE'])){
+#             FALSEs<-x['FALSE']/sum(x,na.rm=TRUE)
+#           }else{FALSEs<-0}
+#           return(rbind(TRUEs,FALSEs))
+          return(TRUEs)
         })
-        colnames(xxx)<-names(xx)
-        rownames(xxx)<-c("TRUE","FALSE")
+        names(xxx)<-names(xx)
+        # rownames(xxx)<-c("TRUE","FALSE")
+        # names(xxx)<-"TRUE"
         dataset<-xxx
         
         
-        if(any(grepl("\\.",colnames(dataset))==TRUE)){
-          colnames(dataset)<-sapply(strsplit(colnames(dataset),split="\\."),"[[",length(strsplit(colnames(dataset),split="\\.")[[1]]))
+        if(any(grepl("\\.",names(dataset))==TRUE)){
+          names(dataset)<-sapply(strsplit(names(dataset),split="\\."),"[[",length(strsplit(names(dataset),split="\\.")[[1]]))
         }
       }else{dataset<-0}
     }
@@ -301,58 +315,46 @@ newPlotGeneric<-function(type,plotName,dataset,
       if(type=="barplot"){
         if(class(dataset)=="matrix" && nrow(dataset)>1){
           rgbcol<-col2rgb(mycolor)
+          mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
+          mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+          mycolor4<-rgb(rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
+          mycolor5<-rgb(255-rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
+          mycolor6<-rgb(255-rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
+          mycolor7<-rgb(rgbcol[1],255-rgbcol[2],255-rgbcol[3],maxColorValue=255)
+          mycolor8<-rgb(255-rgbcol[1],255-rgbcol[2],255-rgbcol[3],maxColorValue=255)
           if(nrow(dataset)==2){
-            mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
             mycolors<-c(mycolor,mycolor2)
-            par(mar=c(addMarBellow,4,4,4))
-            barplot(dataset,col=mycolors,...)
-            if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
           } else {
             if(nrow(dataset)==3){
-              mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
-              mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
               mycolors<-c(mycolor,mycolor2,mycolor3)
-              par(mar=c(addMarBellow,4,4,4))
-              barplot(dataset,col=mycolors,...)
-              if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
             } else {
               if(nrow(dataset)==4){
-                mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
-                mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
-                mycolor4<-rgb(rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
                 mycolors<-c(mycolor,mycolor2,mycolor3,mycolor4)
-                par(mar=c(addMarBellow,4,4,4))
-                barplot(dataset,col=mycolors,...)
-                if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
               } else {
                 if(nrow(dataset)==5){
-                  mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
-                  mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
-                  mycolor4<-rgb(rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
-                  mycolor5<-rgb(255-rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
                   mycolors<-c(mycolor,mycolor2,mycolor3,mycolor4,mycolor5)
-                  par(mar=c(addMarBellow,4,4,4))
-                  barplot(dataset,col=mycolors,...)
-                  if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
                 } else {
                   if(nrow(dataset)==6){
-                    mycolor2<-rgb(255-rgbcol[1],rgbcol[2],rgbcol[3],maxColorValue=255)
-                    mycolor3<-rgb(rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
-                    mycolor4<-rgb(rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
-                    mycolor5<-rgb(255-rgbcol[1],255-rgbcol[2],rgbcol[3],maxColorValue=255)
-                    mycolor6<-rgb(255-rgbcol[1],rgbcol[2],255-rgbcol[3],maxColorValue=255)
                     mycolors<-c(mycolor,mycolor2,mycolor3,mycolor4,mycolor5,mycolor6)
-                    par(mar=c(addMarBellow,4,4,4))
-                    barplot(dataset,col=mycolors,...)
-                    if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
                   } else {
-                    par(mar=c(addMarBellow,4,4,4))
-                    barplot(dataset,...)
+                    if(nrow(dataset)==7){
+                      mycolors<-c(mycolor,mycolor2,mycolor3,mycolor4,mycolor5,mycolor6,mycolor7)
+                    } else {
+                      if(nrow(dataset)==8){
+                        mycolors<-c(mycolor,mycolor2,mycolor3,mycolor4,mycolor5,mycolor6,mycolor7,mycolor8)
+                      } else {
+                        print("Warnings: more than 8 colors, colors could be used twice")
+                        mycolors<-c(mycolor,mycolor2,mycolor3,mycolor4,mycolor5,mycolor6,mycolor7,mycolor8)
+                      }
+                    }
                   }
                 }
               }
             }
           }
+          par(mar=c(addMarBellow,4,4,4))
+          barplot(dataset,col=mycolors,...)
+          if(addLegend==TRUE){legend("topright",legend=rownames(dataset),fill=mycolors)}
         } else {
           mycolors<-mycolor
           par(mar=c(addMarBellow,4,4,4))
