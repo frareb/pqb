@@ -1,0 +1,7 @@
+### plot: Semillas (41,42,45,50,54,59,61,62)
+newPlotBarplot(plotName="SemillasV1",dataset=cuest[,c(41,42,45,50,54,59,61,62)],isRGB=TRUE,isDownload=TRUE,addLegend=TRUE,cond1=cuest[,4],cond2=cuest[,5],cond1Label="DPT",cond2Label="MUN",las=2,addMarBellow=8)
+newPlotBarplot(plotName="SemillasV2",dataset=cuest[,c(65,66,69,74,78,83,85,86)],isRGB=TRUE,isDownload=TRUE,addLegend=TRUE,cond1=cuest[,4],cond2=cuest[,5],cond1Label="DPT",cond2Label="MUN",las=2,addMarBellow=8)
+newPlotBarplot(plotName="SemillasV3",dataset=cuest[,c(89,90,93,98,102,108,110,111)],isRGB=TRUE,isDownload=TRUE,addLegend=TRUE,cond1=cuest[,4],cond2=cuest[,5],cond1Label="DPT",cond2Label="MUN",las=2,addMarBellow=8)
+newPlotBarplot(plotName="SemillasV4",dataset=cuest[,c(141,142,144,147,148,149,150,152)],isRGB=TRUE,isDownload=TRUE,addLegend=TRUE,cond1=cuest[,4],cond2=cuest[,5],cond1Label="DPT",cond2Label="MUN",las=2,addMarBellow=8)
+newPlotBarplot(plotName="SemillasV5",dataset=cuest[,c(158,159,161,164,165,166,167,169)],isRGB=TRUE,isDownload=TRUE,addLegend=TRUE,cond1=cuest[,4],cond2=cuest[,5],cond1Label="DPT",cond2Label="MUN",las=2,addMarBellow=8)
+newPlotBarplot(plotName="SemillasV6",dataset=cuest[,c(175,176,178,181,182,183,184,186)],isRGB=TRUE,isDownload=TRUE,addLegend=TRUE,cond1=cuest[,4],cond2=cuest[,5],cond1Label="DPT",cond2Label="MUN",las=2,addMarBellow=8)
