@@ -1,5 +1,7 @@
 getTab_sysP_semillas<-function(){
   tabPanel("Semillas",
+           h2("De donde vienen las semillas"),
+           dispNewPlotGeneric(plotName="Semillas",isRGB=TRUE,isDownload=TRUE),
            h2("De donde vienen las semillas VARIEDAD 1"),
            dispNewPlotGeneric(plotName="SemillasV1",isRGB=TRUE,isDownload=TRUE,isCond1=TRUE,isCond2=TRUE),
            h2("De donde vienen las semillas VARIEDAD 2"),
