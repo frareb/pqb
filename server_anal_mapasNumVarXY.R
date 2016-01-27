@@ -1,7 +1,4 @@
 library(raster)
-library(ggmap)
-
-load("data/mapas/borderBOL.rda")
 
 getCoords<-function(data=cuest, variedad="Real_Blanca_Quinua_Real")
 {
@@ -28,41 +25,40 @@ variedadList <- sapply(1:length(variedades), function(i){
 variedades<-unlist(variedadList)
 names(variedades) <- variedades
 
-output$varRadio <- renderUI({
-      checkboxGroupInput("varListRadio", "Variedades:",
-                   variedades, selected="Real_Blanca_Quinua_Real")
-})
 
-showMapVariety <- function(variety="Real_Blanca_Quinua_Real"){
+showMapVarietyXY <- function(x, y){
+      listVarietyXY <- vector()
       
-      listStackRaster <- list()
-      listStackRaster<-sapply(1:length(variety), function(i){
-            occ <- getCoords(data=cuest, variedad=variety[i])
+      listVarietyXY<-sapply(1:length(variedades), function(i){
+            occ <- getCoords(data=cuest, variedad=variedades[i])
             if(nrow(occ) >=10){
-                  maxentRaster<-raster(paste0("data/mapas/maxentMaps/maxent_",variety[i],".asc"))
+                  maxentRaster<-raster(paste0("data/mapas/maxentMaps/maxent_",variedades[i],".asc"))
                   val <- getValues(maxentRaster)
                   val[val<0.5] <- 0
                   val[val>=0.5] <- 1
                   values(maxentRaster) <- val
-                  listStackRaster[i] <- maxentRaster
-                  return(listStackRaster[i])
+                  valXY <- extract(maxentRaster, y=cbind(x, y))
+                  if(valXY ==1)
+                  {
+                        listVarietyXY[i] <- paste0(variedades[i],"\n")
+                        return(listVarietyXY[i])
+                  }
             } 
             
       })
-      r3 <- Reduce("+",listStackRaster)
-      val <- getValues(r3)
-      val[val<length(listStackRaster)] <- 0
-      val[val>=length(listStackRaster)] <- 1
-      values(r3) <- val
+      return(listVarietyXY)
       
-      plot(r3, col=rev(heat.colors(40)))
-      plot(borderBOL, add=TRUE, lwd=2)
-
 }
 
-
-newPlot( plotName="MapaMaxentNum",xheight=400, funPlot=function(){
-      
-      showMapVariety(input$varListRadio)
-      
+output$MapaVarXY <- renderText({
+      listQuinoaXY<-unlist(showMapVarietyXY(x=input$xvar, y=input$yvar))
+      listQuinoaXY
 })
+
+
+
+
+
+
+
+

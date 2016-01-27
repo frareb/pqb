@@ -16,6 +16,7 @@ source("ui_sysP_manejo.R", local=TRUE)       # data about intrants
 source("ui_anal_mapasInit.R", local=TRUE)    # simple map with points
 source("ui_anal_mapasNumVar.R", local=TRUE)  # maps of num. of var.
 source("ui_anal_mapasMAxVar.R", local=TRUE)  # maps of all varieties
+source("ui_anal_mapasNumVarXY.R", local=TRUE)  # maps of varieties regarding XY location
 
 shinyUI(fluidPage(
   # includeCSS("www/style.css"),
@@ -38,7 +39,8 @@ shinyUI(fluidPage(
     tabPanel("Analisis",tabsetPanel(
       getTab_anal_mapasInit(),
       getTab_anal_mapasNumVar(),
-      getTab_anal_mapasMAxVar()
+      getTab_anal_mapasMAxVar(),
+      getTab_anal_mapasNumVarXY()
     ))
   )
 ))
