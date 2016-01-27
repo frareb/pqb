@@ -55,6 +55,17 @@ output$MapaVarXY <- renderText({
       listQuinoaXY
 })
 
+maxentRasterAllVar<-raster("data/mapas/maxentMaps/maxent_ALLVARIETIES.asc")
+load("data/mapas/borderBOL.rda")
+
+newPlot( plotName="MapaAllVar",xheight=400, funPlot=function(){
+      
+      plot(maxentRasterAllVar, col=rainbow(10))
+      plot(borderBOL, add=TRUE, lwd=1)
+      points(input$xvar,input$yvar,pch=21, col="black", bg="white", cex=1.8, lwd=2)
+})
+
+
 
 
 
